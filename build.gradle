@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = "${encrypt_chat_wsl_version}"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+
+repositories {
+    mavenCentral()
+}

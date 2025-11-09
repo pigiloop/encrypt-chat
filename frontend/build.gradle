@@ -1,0 +1,67 @@
+plugins {
+    id 'base'
+    id("com.github.node-gradle.node") version "${node_gradle_plugin_version}"
+}
+
+group = 'ru.test'
+version = "${frontend_module_version}"
+
+repositories {
+    mavenCentral()
+}
+
+node {
+    version = "${node_js_version}"
+    download = true
+    workDir = file("${project.projectDir}/.gradle/nodejs")
+    npmWorkDir = file("${project.projectDir}/.gradle/npm")
+}
+
+tasks.register('cleanFrontend', Delete) {
+    description = 'Очистка frontend артефактов'
+
+    delete '.gradle'
+    delete 'build'
+}
+
+tasks.register('prepareFrontendDistribution', Copy) {
+    description = 'Подготовка файлов для distribution'
+
+    from('src') {
+        into('dist')
+    }
+
+    from('.') {
+        include 'package.json'
+        into('dist')
+    }
+
+    from('scripts') {
+        into 'scripts'
+    }
+
+    into "${buildDir}/distribution/app"
+}
+
+tasks.register('zipFrontend', Zip) {
+    description = 'Упаковка frontend модуля в zip архив'
+
+    dependsOn prepareFrontendDistribution
+
+    archiveBaseName = "${frontend_module_name}"
+    archiveVersion = "${frontend_module_version}"
+
+    destinationDirectory = file("${buildDir}/distributions")
+
+    from("${buildDir}/distribution")
+
+    includeEmptyDirs = true
+}
+
+tasks.named('clean') {
+    dependsOn('cleanFrontend')
+}
+
+tasks.named('build') {
+    dependsOn(zipFrontend)
+}
