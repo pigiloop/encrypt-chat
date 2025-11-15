@@ -4,7 +4,7 @@ import jakarta.ws.rs.ApplicationPath;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
-@ApplicationPath("/api/")
+@ApplicationPath("/apiv2/")
 public class JerseyConfig extends ResourceConfig {
 
     public JerseyConfig() {

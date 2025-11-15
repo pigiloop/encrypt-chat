@@ -6,13 +6,20 @@ import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import java.sql.SQLException;
 import java.util.List;
 
-public class UserServiceImpl implements CrudService<User, Long>, TableManagement {
+
+
+public class UserServiceImpl implements CrudService<User, Long>, TableManagement, IUserService {
 
     private final JdbcUserRepositoryImpl jdbcUserRepository;
 
     public UserServiceImpl(JdbcUserRepositoryImpl jdbcUserRepository) {
         this.jdbcUserRepository = jdbcUserRepository;
     }
+
+    public UserServiceImpl() {
+        this.jdbcUserRepository = new JdbcUserRepositoryImpl();
+    }
+
 
     @Override
     public List<User> findAll() {
@@ -47,5 +54,10 @@ public class UserServiceImpl implements CrudService<User, Long>, TableManagement
     @Override
     public void dropTable() throws SQLException, InterruptedException {
         jdbcUserRepository.dropTable();
+    }
+
+    @Override
+    public boolean emailExist(String email) throws SQLException, InterruptedException {
+        return jdbcUserRepository.emailExist(email);
     }
 }

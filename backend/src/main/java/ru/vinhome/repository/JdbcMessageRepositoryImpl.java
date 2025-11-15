@@ -7,13 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 
 public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> {
 
     private static final String SELECT_ALL_SQL = """
             SELECT id, id_sender, id_recipient, message, created_at
-            FROM message;
+            FROM message f;
             """;
 
     private static final String SELECT_BY_ID_SQL = """
@@ -23,8 +22,8 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
             """;
 
     private static final String INSERT_SQL = """
-            INSERT INTO message(id, id_sender, id_recipient, message, created_at)
-            VALUES(?, ?, ?, ?, ?, ?);
+            INSERT INTO message(id, id_sender, id_recipient, message)
+            VALUES(?, ?, ?, ?);
             """;
 
     private static final String UPDATE_SQL = """
@@ -45,7 +44,7 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
                                    id_sender integer REFERENCES users(id),
                                    id_recipient integer REFERENCES users(id),
                                    message text NOT NULL,
-                                   created_at timestamp NOT NULL
+                                   created_at timestamp DEFAULT NOW()
             );
             """;
 
@@ -55,19 +54,21 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
 
 
     @Override
-    public List<Message> findAll() throws SQLException, InterruptedException {
+    public ArrayList<Message> findAll() throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
+        JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
 
         final var preparedStatement = connection.prepareStatement(SELECT_ALL_SQL);
         ResultSet resultSet = preparedStatement.executeQuery();
         ConnectionUtil.returnConnection(connection);
 
         ArrayList<Message> messages = new ArrayList<>();
+
         while (resultSet.next()) {
             messages.add(Message.createMessage(
                     resultSet.getLong(1),
-                    resultSet.getLong(2),
-                    resultSet.getLong(3),
+                    jdbcUserRepository.findById(resultSet.getLong(2), connection),
+                    jdbcUserRepository.findById(resultSet.getLong(3), connection),
                     resultSet.getString(4)
             ));
         }
@@ -77,6 +78,7 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
     @Override
     public Message findById(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
+        JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
 
         final var preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL);
         preparedStatement.setObject(1, id);
@@ -86,8 +88,8 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         if (resultSet.next()) {
             return Message.createMessage(
                     resultSet.getLong(1),
-                    resultSet.getLong(2),
-                    resultSet.getLong(3),
+                    jdbcUserRepository.findById(resultSet.getLong(2), connection),
+                    jdbcUserRepository.findById(resultSet.getLong(3), connection),
                     resultSet.getString(4)
             );
         } else return null;
@@ -100,10 +102,9 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
 
         final var preparedStatement = connection.prepareStatement(INSERT_SQL);
         preparedStatement.setLong(1, obj.getId());
-        preparedStatement.setLong(2, obj.getIdSender());
-        preparedStatement.setLong(3, obj.getIdRecipient());
+        preparedStatement.setLong(2, obj.getSender().getId());
+        preparedStatement.setLong(3, obj.getRecipient().getId());
         preparedStatement.setString(4, obj.getMessage());
-        preparedStatement.setTimestamp(5,  Timestamp.valueOf(obj.getCreatedAt()));
         preparedStatement.execute();
         ConnectionUtil.returnConnection(connection);
         return preparedStatement.getUpdateCount();
@@ -114,8 +115,8 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(UPDATE_SQL);
-        preparedStatement.setLong(1, obj.getIdSender());
-        preparedStatement.setLong(2, obj.getIdRecipient());
+        preparedStatement.setLong(1, obj.getSender().getId());
+        preparedStatement.setLong(2, obj.getRecipient().getId());
         preparedStatement.setString(3, obj.getMessage());
         preparedStatement.setTimestamp(4,  Timestamp.valueOf(obj.getCreatedAt()));
         preparedStatement.setLong(5,  id);

@@ -36,10 +36,6 @@ public class WrapperJettyServer implements AutoCloseable{
         server.start();
     }
 
-    public void stop() throws Exception {
-        server.stop();
-    }
-
     public Server getServer() {return server;}
 
     @Override

@@ -3,6 +3,7 @@ package ru.vinhome.repository;
 import ru.vinhome.model.User;
 import ru.vinhome.util.ConnectionUtil;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,6 +25,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
             SELECT id, username, email, first_name, last_name, password, age
             FROM users
             WHERE email = ?;
+            """;
+
+    private static final String SELECT_BY_USERNAME_SQL = """
+            SELECT id, username, email, first_name, last_name, password, age
+            FROM users
+            WHERE username = ?;
             """;
 
     private static final String INSERT_SQL = """
@@ -85,11 +92,40 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
     public User findById(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
 
+        return findById(id, connection);
+    }
+
+
+    @Override
+    public User findById(Long id, Connection connection) throws SQLException, InterruptedException {
         final var preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL);
         preparedStatement.setObject(1, id);
 
         final var resultSet = preparedStatement.executeQuery();
         ConnectionUtil.returnConnection(connection);
+        if (resultSet.next()) {
+            return User.builder()
+                    .id(resultSet.getLong(1))
+                    .userName(resultSet.getString(2))
+                    .email(resultSet.getString(3))
+                    .firstName(resultSet.getString(4))
+                    .lastName(resultSet.getString(5))
+                    .password(resultSet.getString(6))
+                    .age(resultSet.getInt(7))
+                    .build();
+        } else return null;
+    }
+
+    @Override
+    public User findByUsername(String username) throws SQLException, InterruptedException {
+        final var connection = ConnectionUtil.getConnection();
+
+        final var preparedStatement = connection.prepareStatement(SELECT_BY_USERNAME_SQL);
+        preparedStatement.setString(1, username);
+
+        final var resultSet = preparedStatement.executeQuery();
+        ConnectionUtil.returnConnection(connection);
+
         if (resultSet.next()) {
             return User.builder()
                     .id(resultSet.getLong(1))
@@ -123,8 +159,8 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
 
         final var preparedStatement = connection.prepareStatement(INSERT_SQL);
         preparedStatement.setLong(1, obj.getId());
-        preparedStatement.setString(2, obj.getEmail());
-        preparedStatement.setString(3, obj.getUserName());
+        preparedStatement.setString(2, obj.getUserName());
+        preparedStatement.setString(3, obj.getEmail());
         preparedStatement.setString(4, obj.getFirstName());
         preparedStatement.setString(5, obj.getLastName());
         preparedStatement.setString(6, obj.getPassword());
