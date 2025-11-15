@@ -17,7 +17,7 @@ public class TestRestController {
     public Response get() {
         return Response
                 .status(Response.Status.OK)
-                .entity("TEST")
+                .entity("TEST2")
                 .build();
     }
 

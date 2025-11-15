@@ -2,20 +2,20 @@ package ru.vinhome.model;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Builder
 @Data
+@NoArgsConstructor
 public class User {
-    @NonNull
-    final private Long id;
-    @NonNull
-    final private String userName;
-    final private String email;
-    final private String firstName;
-    final private String lastName;
-    final private String password;
-    final private int age;
+    private Long id;
+    private String userName;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String password;
+    private int age;
 
 
     public User(@NonNull Long id, @NonNull String userName, String email, String firstName, String lastName, String password, int age) {
