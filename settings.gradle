@@ -1,0 +1,3 @@
+rootProject.name = 'encrypt-chat'
+include 'frontend'
+include 'backend'
