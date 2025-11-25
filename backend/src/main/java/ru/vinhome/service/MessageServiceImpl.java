@@ -1,51 +1,67 @@
 package ru.vinhome.service;
 
-import ru.vinhome.model.User;
-import ru.vinhome.repository.JdbcUserRepositoryImpl;
+import ru.vinhome.model.Message;
+import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.ArrayList;
 
-public class MessageServiceImpl implements CrudService<User, Long>, TableManagement {
 
-    private final JdbcUserRepositoryImpl jdbcMessageRepository;
+public class MessageServiceImpl implements CrudService<Message, Long>, TableManagement {
 
-    public MessageServiceImpl(JdbcUserRepositoryImpl jdbcUserRepository) {
-        this.jdbcMessageRepository = jdbcUserRepository;
-    }
+    /*
+    private final JdbcMessageRepositoryImpl jdbcMessageRepository;
+
+    public MessageServiceImpl(JdbcMessageRepositoryImpl jdbcMessageRepository) {
+        this.jdbcMessageRepository = jdbcMessageRepository;
+    }*/
 
     @Override
-    public List<User> findAll() throws SQLException, InterruptedException {
+    public ArrayList<Message> findAll() throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+
         return jdbcMessageRepository.findAll();
     }
 
     @Override
-    public User findById(Long id) throws SQLException, InterruptedException {
+    public Message findById(Long id) throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+
         return jdbcMessageRepository.findById(id);
     }
 
     @Override
-    public int save(User obj) throws SQLException, InterruptedException {
+    public int save(Message obj) throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+
         return jdbcMessageRepository.save(obj);
     }
 
     @Override
-    public void update(Long id, User obj) throws SQLException, InterruptedException {
-        jdbcMessageRepository.update(id, obj);
+    public int update(Long id, Message obj) throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+
+        return jdbcMessageRepository.update(id, obj);
     }
 
     @Override
-    public void delete(Long id) throws SQLException, InterruptedException {
-        jdbcMessageRepository.delete(id);
+    public int delete(Long id) throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+
+        return jdbcMessageRepository.delete(id);
     }
 
     @Override
     public void createTable() throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+
         jdbcMessageRepository.createTable();
     }
 
     @Override
     public void dropTable() throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+
         jdbcMessageRepository.dropTable();
     }
 }

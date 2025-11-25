@@ -11,7 +11,7 @@ public interface CrudService<T, I> {
 
     int save(T obj) throws SQLException, InterruptedException;
 
-    void update(I id, T obj) throws SQLException, InterruptedException;
+    int update(I id, T obj) throws SQLException, InterruptedException;
 
-    void delete(I id) throws SQLException, InterruptedException;
+    int delete(I id) throws SQLException, InterruptedException;
 }

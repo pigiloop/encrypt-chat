@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class Message {
-    final private Long id;
-    final private User sender;
-    final private User recipient;
-    final private String message;
-    final private LocalDateTime createdAt;
+    private Long id;
+    private User sender;
+    private User recipient;
+    private String message;
+    private LocalDateTime createdAt;
 
     private Message(Long id, User sender, User recipient, String message, LocalDateTime createdAt) {
         this.id = id;
@@ -26,13 +26,14 @@ public class Message {
     public static Message createMessage(Long id,
                                         User sender,
                                         User recipient,
-                                        String message) {
+                                        String message,
+                                        LocalDateTime createdAt) {
         return new Message(
                 id,
                 sender,
                 recipient,
                 message,
-                null
+                createdAt
         );
     }
 

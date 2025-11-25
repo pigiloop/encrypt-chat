@@ -1,13 +1,17 @@
 package ru.vinhome.controller;
 
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ru.vinhome.model.User;
 import ru.vinhome.service.UserServiceImpl;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 @Path("/v1/users")
 @Produces(MediaType.APPLICATION_JSON)
@@ -15,6 +19,19 @@ import java.util.ArrayList;
 public class UserRestController {
 
     private static final UserServiceImpl userService = new UserServiceImpl();
+
+    @GET
+    public Response findAll() {
+
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(userService.findAll())
+                    .build();
+        } catch (SQLException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     @POST
     public Response save(final User user) {

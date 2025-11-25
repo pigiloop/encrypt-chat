@@ -1,14 +1,11 @@
 package ru.vinhome.util;
 
-import lombok.experimental.UtilityClass;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayDeque;
 
-@UtilityClass
-public class ConnectionUtil {
+public final class ConnectionUtil {
 
     private static final ArrayDeque<Connection> CONNECTION_POOL = new ArrayDeque<>();
 
@@ -29,6 +26,10 @@ public class ConnectionUtil {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private ConnectionUtil() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
     private static Connection connection() throws SQLException {

@@ -30,7 +30,6 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
             UPDATE message
             SET id_sender = ?, id_recipient = ?, message = ?, created_at = ?
             WHERE id = ?;
-            
             """;
 
     private static final String DELETE_SQL = """
@@ -69,7 +68,8 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
                     resultSet.getLong(1),
                     jdbcUserRepository.findById(resultSet.getLong(2), connection),
                     jdbcUserRepository.findById(resultSet.getLong(3), connection),
-                    resultSet.getString(4)
+                    resultSet.getString(4),
+                    resultSet.getTimestamp(5).toLocalDateTime()
             ));
         }
         return messages;
@@ -90,9 +90,12 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
                     resultSet.getLong(1),
                     jdbcUserRepository.findById(resultSet.getLong(2), connection),
                     jdbcUserRepository.findById(resultSet.getLong(3), connection),
-                    resultSet.getString(4)
+                    resultSet.getString(4),
+                    resultSet.getTimestamp(5).toLocalDateTime()
             );
-        } else return null;
+        } else {
+            return null;
+        }
 
     }
 
@@ -111,7 +114,7 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
     }
 
     @Override
-    public void update(Long id, Message obj) throws SQLException, InterruptedException {
+    public int update(Long id, Message obj) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(UPDATE_SQL);
@@ -122,17 +125,20 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         preparedStatement.setLong(5,  id);
         preparedStatement.execute();
         ConnectionUtil.returnConnection(connection);
+
+        return  preparedStatement.getUpdateCount();
     }
 
     @Override
-    public void delete(Long id) throws SQLException, InterruptedException {
+    public int delete(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(DELETE_SQL);
         preparedStatement.setObject(1, id);
         preparedStatement.execute();
-
         ConnectionUtil.returnConnection(connection);
+
+        return preparedStatement.getUpdateCount();
     }
 
     @Override

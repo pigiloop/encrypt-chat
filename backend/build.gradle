@@ -3,7 +3,7 @@ plugins {
     id("io.freefair.lombok") version "9.0.0"
     id 'jacoco'
     id 'checkstyle'
-    id ("io.qameta.allure") version "3.0.1"
+    id("io.qameta.allure") version "3.0.1"
 }
 
 group = 'ru.test'
@@ -23,17 +23,17 @@ dependencies {
     implementation "org.glassfish.jersey.media:jersey-media-json-jackson:${jersey_server_version}"
     implementation "org.glassfish.jersey.inject:jersey-hk2:${jersey_server_version}"
 
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.6")
+    implementation "org.glassfish.jaxb:jaxb-runtime:${jaxb_runtime_version}"
 
     implementation "ch.qos.logback:logback-core:${logback_version}"
     implementation "ch.qos.logback:logback-classic:${logback_version}"
 
+    implementation "org.postgresql:postgresql:${jdbc_postgres_driver_version}"
 
-    //Database driver
-    // https://mvnrepository.com/artifact/org.postgresql/postgresql
-    implementation("org.postgresql:postgresql:${jdbc_postgres_driver_version}")
+// https://mvnrepository.com/artifact/org.testcontainers/postgresql
+    testImplementation("org.testcontainers:postgresql:1.21.3")
 
-    testImplementation 'io.qameta.allure:allure-junit5:2.30.0'
+    testImplementation "io.qameta.allure:allure-junit5:${allure_junit5_version}"
 
     testImplementation platform("org.junit:junit-bom:${junit_bom_version}")
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -58,13 +58,17 @@ jacocoTestReport {
 
 jacocoTestCoverageVerification {
     dependsOn build
-    violationRules { {
-        rule { {
-            limit {
-                minimum = 0.80
+    violationRules {
+        {
+            rule {
+                {
+                    limit {
+                        minimum = 0.80
+                    }
+                }
             }
-        }}
-    }}
+        }
+    }
 }
 
 checkstyle {

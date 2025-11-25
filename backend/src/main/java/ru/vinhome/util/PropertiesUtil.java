@@ -5,6 +5,12 @@ import java.util.Properties;
 
 public class PropertiesUtil {
 
+    public static final String DB_NAME_KEY = "db.name";
+
+    public static final String DB_PORT_KEY = "db.port";
+
+    public static final String IMAGE_VERSION_KEY_POSTGRESQL = "18.1-alpine3.22";
+
     private static final Properties PROPERTIES = new Properties();
 
     public static final String SERVER_PORT_KEY = "server.port";
@@ -15,15 +21,15 @@ public class PropertiesUtil {
 
     public static final String SERVER_HOST_DEFAULT_VALUE = "127.0.0.1";
 
-    public static final String BD_USERNAME_KEY = "bd.username";
+    public static final String DB_USERNAME_KEY = "db.username";
 
-    public static final String BD_PASSWORD_KEY = "bd.password";
+    public static final String DB_PASSWORD_KEY = "db.password";
 
-    public static final String BD_URL_KEY = "bd.url";
+    public static final String DB_URL_KEY = "db.url";
 
-    public static final String BD_CONNECTION_POOL_SIZE_KEY = "db.connection.pool.size";
+    public static final String DB_CONNECTION_POOL_SIZE_KEY = "db.connection.pool.size";
 
-    public static final String BD_CONNECTION_POOL_SIZE_DEFAULT_VALUE = "5";
+    public static final String DB_CONNECTION_POOL_SIZE_DEFAULT_VALUE = "5";
 
     public static final String LOG_PATH_KEY = "log.path";
 

@@ -113,15 +113,17 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
                     .password(resultSet.getString(6))
                     .age(resultSet.getInt(7))
                     .build();
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public User findByUsername(String username) throws SQLException, InterruptedException {
+    public User findByUsername(String userName) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(SELECT_BY_USERNAME_SQL);
-        preparedStatement.setString(1, username);
+        preparedStatement.setString(1, userName);
 
         final var resultSet = preparedStatement.executeQuery();
         ConnectionUtil.returnConnection(connection);
@@ -136,7 +138,9 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
                     .password(resultSet.getString(6))
                     .age(resultSet.getInt(7))
                     .build();
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -146,10 +150,10 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         final var preparedStatement = connection.prepareStatement(SELECT_BY_EMAIL_SQL);
         preparedStatement.setString(1, email);
 
-        final var resultSet = preparedStatement.execute();
+        final var resultSet = preparedStatement.executeQuery();
         ConnectionUtil.returnConnection(connection);
 
-        return resultSet;
+        return resultSet.next();
 
     }
 
@@ -171,12 +175,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
     }
 
     @Override
-    public void update(Long id, User obj) throws SQLException, InterruptedException {
+    public int update(Long id, User obj) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(UPDATE_SQL);
-        preparedStatement.setLong(1, obj.getId());
-        preparedStatement.setString(2, obj.getUserName());
+        preparedStatement.setString(1, obj.getUserName());
+        preparedStatement.setString(2, obj.getEmail());
         preparedStatement.setString(3, obj.getFirstName());
         preparedStatement.setString(4, obj.getLastName());
         preparedStatement.setString(5, obj.getPassword());
@@ -184,10 +188,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         preparedStatement.setLong(7, id);
         preparedStatement.execute();
         ConnectionUtil.returnConnection(connection);
+
+        return  preparedStatement.getUpdateCount();
     }
 
     @Override
-    public void delete(Long id) throws SQLException, InterruptedException {
+    public int delete(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(DELETE_SQL);
@@ -195,6 +201,8 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         preparedStatement.execute();
 
         ConnectionUtil.returnConnection(connection);
+
+        return preparedStatement.getUpdateCount();
     }
 
     public void createTable() throws SQLException, InterruptedException {

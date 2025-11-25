@@ -4,17 +4,11 @@ import ru.vinhome.model.User;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
 
 import java.sql.SQLException;
-import java.util.List;
-
-
+import java.util.ArrayList;
 
 public class UserServiceImpl implements CrudService<User, Long>, TableManagement, IUserService {
 
     private final JdbcUserRepositoryImpl jdbcUserRepository;
-
-    public UserServiceImpl(JdbcUserRepositoryImpl jdbcUserRepository) {
-        this.jdbcUserRepository = jdbcUserRepository;
-    }
 
     public UserServiceImpl() {
         this.jdbcUserRepository = new JdbcUserRepositoryImpl();
@@ -22,8 +16,8 @@ public class UserServiceImpl implements CrudService<User, Long>, TableManagement
 
 
     @Override
-    public List<User> findAll() {
-        return List.of();
+    public ArrayList<User> findAll() throws SQLException, InterruptedException {
+        return jdbcUserRepository.findAll();
     }
 
     @Override
@@ -32,18 +26,23 @@ public class UserServiceImpl implements CrudService<User, Long>, TableManagement
     }
 
     @Override
+    public User findByUsername(String userName) throws SQLException, InterruptedException {
+        return jdbcUserRepository.findByUsername(userName);
+    }
+
+    @Override
     public int save(User obj) throws SQLException, InterruptedException {
         return jdbcUserRepository.save(obj);
     }
 
     @Override
-    public void update(Long id, User obj) throws SQLException, InterruptedException {
-        jdbcUserRepository.update(id, obj);
+    public int update(Long id, User obj) throws SQLException, InterruptedException {
+        return jdbcUserRepository.update(id, obj);
     }
 
     @Override
-    public void delete(Long id) throws SQLException, InterruptedException {
-        jdbcUserRepository.delete(id);
+    public int delete(Long id) throws SQLException, InterruptedException {
+        return jdbcUserRepository.delete(id);
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import ru.vinhome.config.JerseyConfig;
 import ru.vinhome.util.PropertiesUtil;
 
-public class WrapperJettyServer implements AutoCloseable{
+public class WrapperJettyServer implements AutoCloseable {
 
     private static final int PORT = PropertiesUtil.getPropertyToIntOrDefault(
             PropertiesUtil.SERVER_PORT_KEY,
@@ -36,11 +36,15 @@ public class WrapperJettyServer implements AutoCloseable{
         server.start();
     }
 
-    public Server getServer() {return server;}
+    public Server getServer() {
+        return server;
+    }
 
     @Override
     public void close() throws Exception {
-        if (server.isRunning()) server.destroy();
+        if (server.isRunning()) {
+            server.destroy();
+        }
     }
 
 }

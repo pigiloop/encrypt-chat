@@ -1,8 +1,9 @@
-package ru.vinhome.service;
+package ru.vinhome.service.unit;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
+import ru.vinhome.service.UserServiceImpl;
 
 public class MessageServiceTest {
 
@@ -13,12 +14,7 @@ public class MessageServiceTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    public void findById(){
+    public void findById() {
 
     }
-
-
-
-
-
 }
