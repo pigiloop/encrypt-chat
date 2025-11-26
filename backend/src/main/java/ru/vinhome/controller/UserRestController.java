@@ -9,6 +9,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ru.vinhome.model.User;
+import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import ru.vinhome.service.UserServiceImpl;
 
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ import java.sql.SQLException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserRestController {
 
-    private static final UserServiceImpl userService = new UserServiceImpl();
+    private static final UserServiceImpl userService = new UserServiceImpl(new JdbcUserRepositoryImpl());
 
     @GET
     public Response findAll() {
@@ -57,7 +58,6 @@ public class UserRestController {
         }
     }
 
-
     @GET
     @Path("/{id}")
     public Response findById(@PathParam("id") final long id) {
@@ -76,6 +76,5 @@ public class UserRestController {
                     .build();
         }
     }
-
 
 }

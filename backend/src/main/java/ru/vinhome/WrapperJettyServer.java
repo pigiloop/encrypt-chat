@@ -43,6 +43,7 @@ public class WrapperJettyServer implements AutoCloseable {
     @Override
     public void close() throws Exception {
         if (server.isRunning()) {
+            server.stop();
             server.destroy();
         }
     }

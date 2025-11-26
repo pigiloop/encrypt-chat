@@ -59,7 +59,6 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
 
         final var preparedStatement = connection.prepareStatement(SELECT_ALL_SQL);
         ResultSet resultSet = preparedStatement.executeQuery();
-        ConnectionUtil.returnConnection(connection);
 
         ArrayList<Message> messages = new ArrayList<>();
 
@@ -72,6 +71,8 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
                     resultSet.getTimestamp(5).toLocalDateTime()
             ));
         }
+        ConnectionUtil.returnConnection(connection);
+
         return messages;
     }
 
@@ -152,8 +153,11 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
     @Override
     public void dropTable() throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
-        final var preparedStatement = connection.prepareStatement(DROP_TABLE_SQL);
-        preparedStatement.execute();
-        ConnectionUtil.returnConnection(connection);
+
+        try (var preparedStatement = connection.prepareStatement(DROP_TABLE_SQL);) {
+            preparedStatement.execute();
+        } finally {
+            ConnectionUtil.returnConnection(connection);
+        }
     }
 }

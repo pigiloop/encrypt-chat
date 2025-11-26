@@ -25,7 +25,8 @@ public class PostgresTestContainer {
 
     private static PostgreSQLContainer<?> postgreSQLContainer;
 
-    private PostgresTestContainer() { }
+    private PostgresTestContainer() {
+    }
 
     public static PostgreSQLContainer<?> getInstance() {
         if (postgreSQLContainer == null) {
@@ -64,14 +65,16 @@ public class PostgresTestContainer {
         return getInstance().getMappedPort(DB_PORT);
     }
 
-    public static void initSQL(Path pathToSqlInit) {
-        try (Connection connection = ConnectionUtil.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(Files.readString(pathToSqlInit))) {
+    public static void initSQL(Path pathToSqlInit) throws InterruptedException {
+        Connection connection = ConnectionUtil.getConnection();
+        System.out.println(ConnectionUtil.CONNECTION_POOL);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(Files.readString(pathToSqlInit));) {
             preparedStatement.execute();
-
-        } catch (InterruptedException | SQLException | IOException e) {
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            ConnectionUtil.returnConnection(connection);
         }
-    }
 
+    }
 }

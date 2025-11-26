@@ -7,7 +7,7 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'ru.test'
+group = 'ru.vinhome'
 version = "${backend_module_version}"
 
 ext {
@@ -68,7 +68,7 @@ dependencies {
     implementation "org.postgresql:postgresql:${jdbc_postgres_driver_version}"
 
 // https://mvnrepository.com/artifact/org.testcontainers/postgresql
-    testImplementation("org.testcontainers:postgresql:1.21.3")
+    testImplementation "org.testcontainers:postgresql:${testcontainers_postgresql_version}"
 
     testImplementation "io.qameta.allure:allure-junit5:${allure_junit5_version}"
 

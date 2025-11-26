@@ -12,9 +12,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.postgresql.util.PSQLException;
 import ru.vinhome.controller.integration.ContainerTest;
 import ru.vinhome.model.User;
+import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
+import ru.vinhome.util.ConnectionUtil;
 import ru.vinhome.util.PostgresTestContainer;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -29,6 +32,8 @@ public class JdbcUserRepositoryImplTest {
     @BeforeAll
     static void startContainer() {
         PostgresTestContainer.start();
+
+        ConnectionUtil.reloadPool();
     }
 
     @AfterAll
@@ -37,7 +42,7 @@ public class JdbcUserRepositoryImplTest {
     }
 
     @BeforeEach
-    void createTable() throws SQLException, InterruptedException, URISyntaxException {
+    void createTable() throws SQLException, InterruptedException, URISyntaxException, IOException {
         PostgresTestContainer.initSQL(Paths.get(ContainerTest.class.getClassLoader().getResource("init_db.sql").toURI()));
 
         JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
@@ -66,6 +71,9 @@ public class JdbcUserRepositoryImplTest {
 
     @AfterEach
     void dropTable() throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+        jdbcMessageRepository.dropTable();
+
         JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
         jdbcUserRepository.dropTable();
     }
@@ -166,6 +174,9 @@ public class JdbcUserRepositoryImplTest {
             "1", "2", "3"
     })
     public void deleteTest(String id) throws SQLException, InterruptedException {
+        JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
+        jdbcMessageRepository.dropTable();
+
         JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
         Assertions.assertEquals(
                 1, jdbcUserRepository.delete(Long.valueOf(id)));
