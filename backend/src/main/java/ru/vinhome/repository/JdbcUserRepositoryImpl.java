@@ -93,6 +93,8 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         final var connection = ConnectionUtil.getConnection();
 
         return findById(id, connection);
+
+
     }
 
 
@@ -195,14 +197,17 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
     @Override
     public int delete(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
+        int updateCount = 0;
 
-        final var preparedStatement = connection.prepareStatement(DELETE_SQL);
-        preparedStatement.setObject(1, id);
-        preparedStatement.execute();
+        try (var preparedStatement = connection.prepareStatement(DELETE_SQL);) {
+            preparedStatement.setObject(1, id);
+            preparedStatement.execute();
+            updateCount = preparedStatement.getUpdateCount();
+        } finally {
+            ConnectionUtil.returnConnection(connection);
+        }
 
-        ConnectionUtil.returnConnection(connection);
-
-        return preparedStatement.getUpdateCount();
+            return updateCount;
     }
 
     public void createTable() throws SQLException, InterruptedException {

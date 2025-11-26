@@ -13,12 +13,15 @@ import ru.vinhome.model.Message;
 import ru.vinhome.model.User;
 import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
+import ru.vinhome.util.ConnectionUtil;
 import ru.vinhome.util.PostgresTestContainer;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 
 public class JdbcMessageRepositoryImplTest {
 
@@ -28,6 +31,7 @@ public class JdbcMessageRepositoryImplTest {
     @BeforeAll
     static void startContainer() {
         PostgresTestContainer.start();
+        ConnectionUtil.reloadPool();
     }
 
     @AfterAll
@@ -36,7 +40,7 @@ public class JdbcMessageRepositoryImplTest {
     }
 
     @BeforeEach
-    void createTable() throws SQLException, InterruptedException, URISyntaxException {
+    void createTable() throws SQLException, InterruptedException, URISyntaxException, IOException {
 
         PostgresTestContainer.initSQL(Paths.get(ContainerTest.class.getClassLoader().getResource("init_db.sql").toURI()));
 
@@ -49,11 +53,11 @@ public class JdbcMessageRepositoryImplTest {
     @AfterEach
     void dropTable() throws SQLException, InterruptedException {
         JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
-        //    jdbcMessageRepository.dropTable();
+        jdbcMessageRepository.dropTable();
 
 
         JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
-        //     jdbcUserRepository.dropTable();
+        jdbcUserRepository.dropTable();
     }
 
     @ParameterizedTest

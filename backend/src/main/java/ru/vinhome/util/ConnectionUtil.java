@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
 
 public final class ConnectionUtil {
 
-    private static final ArrayDeque<Connection> CONNECTION_POOL = new ArrayDeque<>();
+    public static final ArrayDeque<Connection> CONNECTION_POOL = new ArrayDeque<>();
 
     private static final String URL = PropertiesUtil.get("db.url.ip");
 
@@ -19,6 +19,11 @@ public final class ConnectionUtil {
             getPropertyToIntOrDefault("db.connection.pool.size", "5");
 
     static {
+        initPool();
+    }
+
+    private static void initPool() {
+
         for (int i = 0; i < POOL_SIZE; i++) {
             try {
                 CONNECTION_POOL.addLast(connection());
@@ -26,6 +31,11 @@ public final class ConnectionUtil {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public static void reloadPool() {
+        CONNECTION_POOL.clear();
+        initPool();
     }
 
     private ConnectionUtil() {
@@ -45,6 +55,9 @@ public final class ConnectionUtil {
     }
 
     public static void returnConnection(final Connection connection) {
+        if (CONNECTION_POOL.contains(connection)) {
+            return;
+        }
         CONNECTION_POOL.addLast(connection);
     }
 }

@@ -8,10 +8,10 @@ import java.util.ArrayList;
 
 public class UserServiceImpl implements CrudService<User, Long>, TableManagement, IUserService {
 
-    private final JdbcUserRepositoryImpl jdbcUserRepository;
+    private JdbcUserRepositoryImpl jdbcUserRepository = null;
 
-    public UserServiceImpl() {
-        this.jdbcUserRepository = new JdbcUserRepositoryImpl();
+    public UserServiceImpl(JdbcUserRepositoryImpl userRepository) {
+        this.jdbcUserRepository = userRepository;
     }
 
 

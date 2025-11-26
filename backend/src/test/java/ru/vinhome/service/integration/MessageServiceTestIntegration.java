@@ -1,7 +1,9 @@
 package ru.vinhome.service.integration;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,13 +13,26 @@ import ru.vinhome.model.User;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import ru.vinhome.service.MessageServiceImpl;
 import ru.vinhome.service.UserServiceImpl;
+import ru.vinhome.util.ConnectionUtil;
+import ru.vinhome.util.PostgresTestContainer;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class MessageServiceTest {
+public class MessageServiceTestIntegration {
     private static ArrayList<Message> messages = null;
     private static ArrayList<User> users = null;
+
+    @BeforeAll
+    static void startContainer() {
+        PostgresTestContainer.start();
+        ConnectionUtil.reloadPool();
+    }
+
+    @AfterAll
+    static void stopContainer() {
+        PostgresTestContainer.stop();
+    }
 
     @BeforeEach
     void createTable() throws SQLException, InterruptedException {
@@ -52,7 +67,8 @@ public class MessageServiceTest {
 
 
     private static void createAndFillUserTable() throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
         userService.createTable();
 
         users = new ArrayList<>();
@@ -78,8 +94,8 @@ public class MessageServiceTest {
         MessageServiceImpl messageService = new MessageServiceImpl();
         messageService.dropTable();
 
-
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
         userService.dropTable();
     }
 
@@ -92,7 +108,8 @@ public class MessageServiceTest {
     public void insertDataTest(String id, String strSender, String strRecipient, String text, int result)
             throws SQLException, InterruptedException {
 
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
 
         Message message = Message.createMessage(
                 Long.valueOf(id),
