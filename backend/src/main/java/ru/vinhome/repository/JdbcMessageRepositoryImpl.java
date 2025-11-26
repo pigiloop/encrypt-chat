@@ -121,12 +121,12 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         preparedStatement.setLong(1, obj.getSender().getId());
         preparedStatement.setLong(2, obj.getRecipient().getId());
         preparedStatement.setString(3, obj.getMessage());
-        preparedStatement.setTimestamp(4,  Timestamp.valueOf(obj.getCreatedAt()));
-        preparedStatement.setLong(5,  id);
+        preparedStatement.setTimestamp(4, Timestamp.valueOf(obj.getCreatedAt()));
+        preparedStatement.setLong(5, id);
         preparedStatement.execute();
         ConnectionUtil.returnConnection(connection);
 
-        return  preparedStatement.getUpdateCount();
+        return preparedStatement.getUpdateCount();
     }
 
     @Override

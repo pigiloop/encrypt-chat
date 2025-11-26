@@ -28,12 +28,12 @@ public class JdbcUserRepositoryImplTest {
 
     @BeforeAll
     static void startContainer() {
-        PostgresTestContainer.getInstance().start();
+        PostgresTestContainer.start();
     }
 
     @AfterAll
     static void stopContainer() {
-        PostgresTestContainer.getInstance().stop();
+        PostgresTestContainer.stop();
     }
 
     @BeforeEach

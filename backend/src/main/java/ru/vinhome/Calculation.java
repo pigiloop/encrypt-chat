@@ -27,6 +27,9 @@ import java.util.regex.Pattern;
  */
 public class Calculation {
 
+    private Calculation() {
+    }
+
     public static void main(String[] args) throws IOException {
         File file = new File("lines.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -45,9 +48,6 @@ public class Calculation {
         Matcher matcher = pattern.matcher(line);
 
         return !line.isEmpty();
-    }
-
-    private Calculation() {
     }
 
     /**

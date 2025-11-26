@@ -1,10 +1,11 @@
 package ru.vinhome;
 
-import ru.vinhome.model.User;
 import ru.vinhome.service.MessageServiceImpl;
 import ru.vinhome.service.UserServiceImpl;
 
 public class Main {
+
+    private Main() { }
 
     public static void main(String[] args) throws Exception {
 
@@ -13,7 +14,6 @@ public class Main {
 
         MessageServiceImpl messageService = new MessageServiceImpl();
         messageService.createTable();
-
 
 
         try (var wrapperJettyServer = new WrapperJettyServer()) {

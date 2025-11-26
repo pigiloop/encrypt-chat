@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class PostgresTestContainer {
+
     private static final String DB_USERNAME = PropertiesUtil.get(PropertiesUtil.DB_USERNAME_KEY);
     private static final String DB_PASSWORD = PropertiesUtil.get(PropertiesUtil.DB_PASSWORD_KEY);
     private static final int DB_PORT = PropertiesUtil.getPropertyToInt(PropertiesUtil.DB_PORT_KEY);
@@ -23,6 +24,8 @@ public class PostgresTestContainer {
             "18.1-alpine3.22");
 
     private static PostgreSQLContainer<?> postgreSQLContainer;
+
+    private PostgresTestContainer() { }
 
     public static PostgreSQLContainer<?> getInstance() {
         if (postgreSQLContainer == null) {
@@ -62,7 +65,6 @@ public class PostgresTestContainer {
     }
 
     public static void initSQL(Path pathToSqlInit) {
-
         try (Connection connection = ConnectionUtil.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(Files.readString(pathToSqlInit))) {
             preparedStatement.execute();

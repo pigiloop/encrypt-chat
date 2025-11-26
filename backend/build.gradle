@@ -4,13 +4,50 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id("io.qameta.allure") version "3.0.1"
+    id 'maven-publish'
 }
 
 group = 'ru.test'
 version = "${backend_module_version}"
 
+ext {
+    nexusUrl = System.getenv('NEXUS_URL') ?: project.findProperty('nexus_url')
+    nexusUsername = System.getenv('NEXUS_USERNAME') ?: project.findProperty('nexus_username')
+    nexusPassword = System.getenv('NEXUS_PASSWORD') ?: project.findProperty('nexus_password')
+}
+
 repositories {
-    mavenCentral()
+    maven {
+        allowInsecureProtocol = true // будем ходить по http в nexus
+        url = "${nexusUrl}/repository/maven-central/" // куда мы идем?
+
+        credentials {
+            username nexusUsername
+            password nexusPassword
+        }
+    }
+
+    // maven snapshot
+    maven {
+        allowInsecureProtocol = true // будем ходить по http в nexus
+        url = "${nexusUrl}/repository/maven-snapshots/" // куда мы идем?
+
+        credentials {
+            username nexusUsername
+            password nexusPassword
+        }
+    }
+
+    // maven release
+    maven {
+        allowInsecureProtocol = true // будем ходить по http в nexus
+        url = "${nexusUrl}/repository/maven-releases/" // куда мы идем?
+
+        credentials {
+            username nexusUsername
+            password nexusPassword
+        }
+    }
 }
 
 dependencies {
@@ -74,6 +111,31 @@ jacocoTestCoverageVerification {
 checkstyle {
     toolVersion = "10.12.4"
     configFile = file("config/checkstyle/checkstyle.xml")
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            group group
+            artifactId "${backend_module_name}"
+            version version
+        }
+    }
+
+    repositories {
+        maven {
+            allowInsecureProtocol = true
+            url = version.endsWith("SNAPSHOT")
+                    ? "${nexusUrl}/repository/maven-snapshots/"
+                    : "${nexusUrl}/repository/maven-releases/"
+            credentials {
+                username = nexusUsername
+                password = nexusPassword
+            }
+        }
+    }
 }
 
 test {

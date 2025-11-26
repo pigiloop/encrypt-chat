@@ -76,14 +76,14 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         ArrayList<User> users = new ArrayList<>();
         while (resultSet.next()) {
             users.add(User.builder()
-                            .id(resultSet.getLong(1))
-                            .userName(resultSet.getString(2))
-                            .email(resultSet.getString(3))
-                            .firstName(resultSet.getString(4))
-                            .lastName(resultSet.getString(5))
-                            .password(resultSet.getString(6))
-                            .age(resultSet.getInt(7))
-                            .build());
+                    .id(resultSet.getLong(1))
+                    .userName(resultSet.getString(2))
+                    .email(resultSet.getString(3))
+                    .firstName(resultSet.getString(4))
+                    .lastName(resultSet.getString(5))
+                    .password(resultSet.getString(6))
+                    .age(resultSet.getInt(7))
+                    .build());
         }
         return users;
     }
@@ -189,7 +189,7 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         preparedStatement.execute();
         ConnectionUtil.returnConnection(connection);
 
-        return  preparedStatement.getUpdateCount();
+        return preparedStatement.getUpdateCount();
     }
 
     @Override
