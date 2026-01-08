@@ -89,7 +89,6 @@ public class JdbcMessageRepositoryImplTest {
 
         ArrayList<Message> messageArrayList = jdbcMessageRepository.findAll();
 
-
         Assertions.assertEquals(messages.get(0), messageArrayList.get(0));
         Assertions.assertEquals(messages.get(1), messageArrayList.get(1));
         Assertions.assertEquals(messages.get(2), messageArrayList.get(2));

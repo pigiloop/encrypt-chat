@@ -6,6 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+/**
+ * Класс модели User.
+ * В этом классе реализуется модель User. В нём реализована структура хранения данных о пользователе.
+ *
+ */
 @Builder
 @Data
 @AllArgsConstructor

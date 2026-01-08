@@ -8,6 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * Класс JdbcUserRepositoryImpl реализующий интерфейсы BaseRepository и UserRepository.
+ * В данном интерфейсе описаны методы для реализации CRUD в базе данных с таблицей users.
+ * @see BaseRepository
+ * @see UserRepository
+ * @see User
+ */
 public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserRepository {
 
     private static final String SELECT_ALL_SQL = """
@@ -65,6 +72,14 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
             DROP TABLE IF EXISTS users;
             """;
 
+    /**
+     * Метод выводит все записи таблицы users.
+     * @return возвращает список объектов типа User
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @see User
+     * *
+     */
     @Override
     public ArrayList<User> findAll() throws InterruptedException, SQLException {
         final var connection = ConnectionUtil.getConnection();
@@ -88,6 +103,15 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         return users;
     }
 
+    /**
+     * Метод выводит запись таблицы users по её уникальному идентификатору.
+     * @return возвращает объект типа User
+     * @param id идентификатор типа Long
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @see User
+     * *
+     */
     @Override
     public User findById(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -97,7 +121,17 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
 
     }
 
-
+    /**
+     * Метод выводит запись таблицы users по её уникальному идентификатору используя существующее соединение connection типа Connection.
+     * @param id идентификатор типа Long
+     * @param connection параметр типа Connection, нужен для использования существующего соединения
+     * @return возвращает объект типа User
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @see User
+     * @see Connection
+     * *
+     */
     @Override
     public User findById(Long id, Connection connection) throws SQLException, InterruptedException {
         final var preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL);
@@ -120,6 +154,15 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         }
     }
 
+    /**
+     * Метод выводит запись таблицы по имени пользователя.
+     * @param userName имя пользователя типа String
+     * @return возвращает объект типа User
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @see User
+     * *
+     */
     @Override
     public User findByUsername(String userName) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -145,6 +188,14 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         }
     }
 
+    /**
+     * Метод проверяет наличие записи электронной почты в таблице users.
+     * @param email электронная почта пользователя типа String
+     * @return возвращает true или false в зависимости есть ли указанная электронная почта в таблице или нет.
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * *
+     */
     @Override
     public boolean emailExist(String email) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -159,6 +210,15 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
 
     }
 
+    /**
+     * Метод сохраняет запись таблицы user.
+     * @param obj экземпляр класса User
+     * @return возвращает количество изменённых записей
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @see User
+     * *
+     */
     @Override
     public int save(final User obj) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -176,6 +236,16 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         return preparedStatement.getUpdateCount();
     }
 
+    /**
+     * Метод изменяет запись таблицы по её уникальному идентификатору.
+     * @param id идентификатор типа Long
+     * @param obj экземпляр класса User
+     * @return возвращает количество изменённых записей
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @see User
+     * *
+     */
     @Override
     public int update(Long id, User obj) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -194,6 +264,15 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         return preparedStatement.getUpdateCount();
     }
 
+    /**
+     * Метод удаляет запись из таблицы по её уникальному идентификатору.
+     * @param id идентификатор типа Long
+     * @return возвращает количество удалённых записей
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @see User
+     * *
+     */
     @Override
     public int delete(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -210,6 +289,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
             return updateCount;
     }
 
+    /**
+     * Метод создаёт таблицу users
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * *
+     */
     public void createTable() throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
         final var preparedStatement = connection.prepareStatement(CREATE_TABLE_SQL);
@@ -217,6 +302,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         ConnectionUtil.returnConnection(connection);
     }
 
+    /**
+     * Метод удаляет таблицу users
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * *
+     */
     public void dropTable() throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
         final var preparedStatement = connection.prepareStatement(DROP_TABLE_SQL);

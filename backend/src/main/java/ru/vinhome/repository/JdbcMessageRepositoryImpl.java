@@ -1,13 +1,22 @@
 package ru.vinhome.repository;
 
 import ru.vinhome.model.Message;
+import ru.vinhome.model.User;
 import ru.vinhome.util.ConnectionUtil;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+/**
+ * Класс JdbcMessageRepositoryImpl реализующий интерфейс BaseRepository.
+ * В данном классе реализованы методы CRUD, для манипуляций в базе данных с таблицей message
+ *
+ * @see BaseRepository
+ * @see Message
+ */
 public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> {
 
     private static final String SELECT_ALL_SQL = """
@@ -51,7 +60,14 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
             DROP TABLE IF EXISTS message;
             """;
 
-
+    /**
+     * Метод выводит все записи таблицы message.
+     *
+     * @return возвращает список объектов типа Message
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
+     */
     @Override
     public ArrayList<Message> findAll() throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -76,9 +92,38 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         return messages;
     }
 
-    @Override
+    /**
+     * Метод выводит запись таблицы message по её уникальному идентификатору используя существующее соединение connection типа Connection.
+     *
+     * @param id идентификатор типа Long
+     * @return возвращает объект типа Message
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     * @see Message
+     * @see Connection
+     * *
+     */
     public Message findById(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
+        JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
+
+        return findById(id, connection);
+    }
+
+    /**
+     * Метод выводит запись таблицы message по её уникальному идентификатору используя существующее соединение connection типа Connection.
+     *
+     * @param id         идентификатор типа Long
+     * @param connection параметр типа Connection, нужен для использования существующего соединения
+     * @return возвращает объект типа Message
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     * @see Message
+     * *
+     */
+    @Override
+    public Message findById(Long id, Connection connection) throws SQLException, InterruptedException {
+
         JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
 
         final var preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL);
@@ -100,6 +145,16 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
 
     }
 
+    /**
+     * Метод сохраняет запись в таблице message.
+     *
+     * @param obj объект типа Message
+     * @return возвращает количество изменённых записей в таблице message
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     * @see Message
+     *
+     */
     @Override
     public int save(Message obj) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -114,6 +169,17 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         return preparedStatement.getUpdateCount();
     }
 
+    /**
+     * Метод изменяет запись в таблице message.
+     *
+     * @param id  идентификатор типа Long
+     * @param obj объект типа Message
+     * @return возвращает количество изменённых записей
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     * @see Message
+     * *
+     */
     @Override
     public int update(Long id, Message obj) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -130,6 +196,15 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         return preparedStatement.getUpdateCount();
     }
 
+    /**
+     * Метод удаляет запись из таблицы message.
+     *
+     * @param id идентификатор типа Long
+     * @return возвращает количество изменённых записей
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
+     */
     @Override
     public int delete(Long id) throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -142,6 +217,13 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         return preparedStatement.getUpdateCount();
     }
 
+    /**
+     * Метод создаёт таблицу message.
+     *
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
+     */
     @Override
     public void createTable() throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
@@ -150,6 +232,13 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> 
         ConnectionUtil.returnConnection(connection);
     }
 
+    /**
+     * Метод удаляет таблицу message.
+     *
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
+     */
     @Override
     public void dropTable() throws SQLException, InterruptedException {
         final var connection = ConnectionUtil.getConnection();
