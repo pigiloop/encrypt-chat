@@ -6,7 +6,7 @@ import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class UserServiceImpl implements CrudService<User, Long>, TableManagement, IUserService {
+public class UserServiceImpl implements UserService {
 
     private JdbcUserRepositoryImpl jdbcUserRepository = null;
 
