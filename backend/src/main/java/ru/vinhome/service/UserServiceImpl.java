@@ -1,21 +1,12 @@
 package ru.vinhome.service;
 
-import ru.vinhome.model.Message;
 import ru.vinhome.model.User;
-import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-/**
- * Класс UserServiceImpl реализующий интерфейсы CrudService и TableManagement.
- * В данном классе реализованы методы сервис слоя User, для манипуляций данными типа User
- *
- * @see CrudService
- * @see Message
- */
-public class UserServiceImpl implements CrudService<User, Long>, TableManagement, IUserService {
+public class UserServiceImpl implements UserService {
 
     private JdbcUserRepositoryImpl jdbcUserRepository = null;
 
@@ -24,8 +15,7 @@ public class UserServiceImpl implements CrudService<User, Long>, TableManagement
      * JdbcMessageRepository
      *
      * @param userRepository параметр типа JdbcUserRepositoryImpl
-     * @see JdbcMessageRepositoryImpl
-     * @see Message
+     * @see JdbcUserRepositoryImpl
      */
     public UserServiceImpl(JdbcUserRepositoryImpl userRepository) {
         this.jdbcUserRepository = userRepository;

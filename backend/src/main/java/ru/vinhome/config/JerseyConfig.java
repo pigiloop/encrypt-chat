@@ -25,6 +25,7 @@ public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
         packages("ru.vinhome.controller");
         register(JacksonFeature.class);
+        register(new DependencyBinder());
     }
 
 }

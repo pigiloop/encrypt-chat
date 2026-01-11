@@ -1,16 +1,11 @@
 package ru.vinhome.controller;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ru.vinhome.model.User;
-import ru.vinhome.repository.JdbcUserRepositoryImpl;
-import ru.vinhome.service.UserServiceImpl;
+import ru.vinhome.service.UserService;
 
 import java.sql.SQLException;
 
@@ -19,11 +14,15 @@ import java.sql.SQLException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserRestController {
 
-    private static final UserServiceImpl userService = new UserServiceImpl(new JdbcUserRepositoryImpl());
+    private final UserService userService;
+
+    @Inject
+    public UserRestController(final UserService userService) {
+        this.userService = userService;
+    }
 
     @GET
     public Response findAll() {
-
         try {
             return Response.status(Response.Status.OK)
                     .entity(userService.findAll())
@@ -48,6 +47,7 @@ public class UserRestController {
                         .entity("This email exist, please enter other email")
                         .build();
             }
+
             userService.save(user);
 
             return Response.status(Response.Status.CREATED)
