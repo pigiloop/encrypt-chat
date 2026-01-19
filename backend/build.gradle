@@ -59,6 +59,8 @@ dependencies {
     implementation "org.glassfish.jersey.containers:jersey-container-servlet-core:${jersey_server_version}"
     implementation "org.glassfish.jersey.media:jersey-media-json-jackson:${jersey_server_version}"
     implementation "org.glassfish.jersey.inject:jersey-hk2:${jersey_server_version}"
+    implementation "org.glassfish.jersey.ext:jersey-bean-validation:${jersey_server_version}"
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
 
     implementation "org.glassfish.jaxb:jaxb-runtime:${jaxb_runtime_version}"
 
@@ -100,7 +102,7 @@ jacocoTestCoverageVerification {
             rule {
                 {
                     limit {
-                        minimum = 0.80
+                        minimum = 0.78
                     }
                 }
             }

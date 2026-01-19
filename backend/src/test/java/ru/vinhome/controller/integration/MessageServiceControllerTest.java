@@ -20,7 +20,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-public class UserRestControllerTest {
+public class MessageServiceControllerTest {
 
     private static final int SERVER_PORT = 8088;
 
@@ -68,7 +68,7 @@ public class UserRestControllerTest {
 
     @Test
     void findAll() throws IOException, InterruptedException {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/users"))
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/messages"))
                 .GET()
                 .header("Accept", "application/json")
                 .build();
@@ -79,20 +79,7 @@ public class UserRestControllerTest {
 
     @Test
     void findById() throws IOException, InterruptedException {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/users/1"))
-                .GET()
-                .header("Accept", "application/json")
-                .build();
-
-        HttpResponse<String> httpResponse = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-
-        System.out.println(httpResponse);
-    }
-
-    @Test
-    void findByUserName() throws IOException, InterruptedException {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/users/username=kovin"))
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/messages/1"))
                 .GET()
                 .header("Accept", "application/json")
                 .build();
@@ -105,7 +92,7 @@ public class UserRestControllerTest {
 
     @Test
     void delete() throws IOException, InterruptedException {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/users/1"))
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/messages/1"))
                 .DELETE()
                 .header("Accept", "application/json")
                 .build();
@@ -115,31 +102,5 @@ public class UserRestControllerTest {
 
         System.out.println(httpResponse);
     }
-
-    @Test
-    void save() throws IOException, InterruptedException {
-
-        String message = """
-                  {
-                    "userName": "newmegauser",
-                    "email": "zoom_long@mail.ru",
-                    "firstName": "Kirka",
-                    "lastName": "Vintik",
-                    "password": "pass12345",
-                    "age": 33
-                  }
-                """;
-
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/users/"))
-                .POST(HttpRequest.BodyPublishers.ofString(message))
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/json")
-                .build();
-
-        HttpResponse<String> httpResponse = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(httpResponse.body());
-    }
-
-
 
 }

@@ -1,12 +1,12 @@
 package ru.vinhome.service;
 
 import ru.vinhome.model.Message;
-import ru.vinhome.repository.BaseRepository;
 import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 
 /**
  * Класс MessageServiceImpl реализующий интерфейсы CrudService и TableManagement.
@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * @see CrudService
  * @see Message
  */
-public class MessageServiceImpl implements CrudService<Message, Long>, TableManagement {
+public class MessageServiceImpl implements MessageService {
 
 
     private final JdbcMessageRepositoryImpl jdbcMessageRepository;

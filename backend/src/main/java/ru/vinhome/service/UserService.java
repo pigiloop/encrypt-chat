@@ -1,6 +1,34 @@
 package ru.vinhome.service;
 
+import ru.vinhome.controller.dto.UserCreateRequest;
+import ru.vinhome.controller.dto.UserUpdateRequest;
 import ru.vinhome.model.User;
 
-public interface UserService extends CrudService<User, Long>, IUserService, TableManagement{
+import java.sql.SQLException;
+
+public interface UserService extends CrudService<User, UserCreateRequest, UserUpdateRequest, Long>, TableManagement {
+
+    /**
+     * Метод проверяет наличие записи электронной почты в таблице users.
+     *
+     * @param email электронная почта пользователя типа String
+     * @return возвращает true или false в зависимости есть ли указанная электронная почта в таблице или нет.
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
+     */
+    boolean emailExist(String email) throws SQLException, InterruptedException;
+
+    /**
+     * Метод выводит запись таблицы по имени пользователя.
+     *
+     * @param userName имя пользователя типа String
+     * @return возвращает объект типа User
+     * @throws InterruptedException возникает в случае ошибки получения подключения
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     * @see User
+     * *
+     */
+    User findByUsername(String userName) throws SQLException, InterruptedException;
+
 }

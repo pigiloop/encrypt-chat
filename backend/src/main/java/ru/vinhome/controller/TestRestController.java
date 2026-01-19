@@ -17,6 +17,11 @@ import jakarta.ws.rs.core.Response;
 @Consumes(MediaType.TEXT_PLAIN)
 public class TestRestController {
 
+
+    /**
+     * Метод заглушка выдающий положительный ответ
+     * @return возвращает положительный ответ с кодом 200
+     */
     @GET
     public Response get() {
         return Response

@@ -1,7 +1,6 @@
 package ru.vinhome.repository;
 
 import ru.vinhome.model.Message;
-import ru.vinhome.model.User;
 import ru.vinhome.util.ConnectionUtil;
 
 import java.sql.Connection;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
  *
  * @see BaseRepository
  * @see Message
- */
+  */
 public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Long> {
 
     private static final String SELECT_ALL_SQL = """

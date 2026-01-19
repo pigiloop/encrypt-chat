@@ -2,6 +2,7 @@ package ru.vinhome.model;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -12,11 +13,30 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
+@NoArgsConstructor
 public class Message {
+    /**
+     * Идентификатор сообщения
+     */
     private Long id;
+    /**
+     * Отправитель сообщения
+     */
     private User sender;
+
+    /**
+     * Получатель сообщения
+     */
     private User recipient;
+
+    /**
+     * Текст сообщения
+     */
     private String message;
+
+    /**
+     * Дата создания сообщения
+     */
     private LocalDateTime createdAt;
 
 

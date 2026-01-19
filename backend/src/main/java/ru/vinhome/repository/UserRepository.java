@@ -2,7 +2,6 @@ package ru.vinhome.repository;
 
 import ru.vinhome.model.User;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**

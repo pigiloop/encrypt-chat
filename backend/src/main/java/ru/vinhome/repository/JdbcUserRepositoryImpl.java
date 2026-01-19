@@ -41,13 +41,13 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
             """;
 
     private static final String INSERT_SQL = """
-            INSERT INTO users(id, username, email, first_name, last_name, password, age)
-            VALUES(?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO users(username, email, first_name, last_name, password, age)
+            VALUES(?, ?, ?, ?, ?, ?);
             """;
 
     private static final String UPDATE_SQL = """
             UPDATE users
-            SET username = ?, email = ?, first_name = ?, last_name = ?, password = ?, age = ?
+            SET first_name = ?, last_name = ?, age = ?
             WHERE id = ?;
             """;
 
@@ -58,8 +58,8 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
 
     private static final String CREATE_TABLE_SQL = """
             CREATE TABLE IF NOT EXISTS users (
-                                   id integer PRIMARY KEY,
-                                   username varchar(64) NOT NULL UNIQUE,
+                                   id SERIAL PRIMARY KEY,
+                                   username VARCHAR(64) NOT NULL UNIQUE,
                                    email varchar(255) NOT NULL UNIQUE,
                                    first_name varchar(64),
                                    last_name varchar(64),
@@ -224,13 +224,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(INSERT_SQL);
-        preparedStatement.setLong(1, obj.getId());
-        preparedStatement.setString(2, obj.getUserName());
-        preparedStatement.setString(3, obj.getEmail());
-        preparedStatement.setString(4, obj.getFirstName());
-        preparedStatement.setString(5, obj.getLastName());
-        preparedStatement.setString(6, obj.getPassword());
-        preparedStatement.setInt(7, obj.getAge());
+        preparedStatement.setString(1, obj.getUserName());
+        preparedStatement.setString(2, obj.getEmail());
+        preparedStatement.setString(3, obj.getFirstName());
+        preparedStatement.setString(4, obj.getLastName());
+        preparedStatement.setString(5, obj.getPassword());
+        preparedStatement.setInt(6, obj.getAge());
         preparedStatement.execute();
         ConnectionUtil.returnConnection(connection);
         return preparedStatement.getUpdateCount();
@@ -251,13 +250,10 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Long>, UserR
         final var connection = ConnectionUtil.getConnection();
 
         final var preparedStatement = connection.prepareStatement(UPDATE_SQL);
-        preparedStatement.setString(1, obj.getUserName());
-        preparedStatement.setString(2, obj.getEmail());
-        preparedStatement.setString(3, obj.getFirstName());
-        preparedStatement.setString(4, obj.getLastName());
-        preparedStatement.setString(5, obj.getPassword());
-        preparedStatement.setInt(6, obj.getAge());
-        preparedStatement.setLong(7, id);
+        preparedStatement.setString(1, obj.getFirstName());
+        preparedStatement.setString(2, obj.getLastName());
+        preparedStatement.setInt(3, obj.getAge());
+        preparedStatement.setLong(4, id);
         preparedStatement.execute();
         ConnectionUtil.returnConnection(connection);
 

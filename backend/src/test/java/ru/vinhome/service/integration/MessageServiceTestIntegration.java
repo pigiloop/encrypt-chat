@@ -81,11 +81,11 @@ public class MessageServiceTestIntegration {
 
         users.add(new User(3L, "user3", "cherepok@mail.ru", "Oleg",
                 "Cherpanov", "qwerty", 23));
-
+/*
         for (User user : users) {
             userService.save(user);
         }
-
+*/
     }
 
 

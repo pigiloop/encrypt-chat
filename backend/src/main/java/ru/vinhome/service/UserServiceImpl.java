@@ -1,5 +1,7 @@
 package ru.vinhome.service;
 
+import ru.vinhome.controller.dto.UserCreateRequest;
+import ru.vinhome.controller.dto.UserUpdateRequest;
 import ru.vinhome.model.User;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
 
@@ -8,7 +10,7 @@ import java.util.ArrayList;
 
 public class UserServiceImpl implements UserService {
 
-    private JdbcUserRepositoryImpl jdbcUserRepository = null;
+    private final JdbcUserRepositoryImpl jdbcUserRepository;
 
     /**
      * Конструктор класса JdbcMessageServiceImpl принимающий в качестве параметра экземпляр класса
@@ -36,10 +38,11 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод выводит запись таблицы users по её уникальному идентификатору.
+     *
      * @param id идентификатор типа Long
      * @return возвращает объект типа User
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
@@ -50,10 +53,11 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод выводит запись таблицы по имени пользователя.
+     *
      * @param userName имя пользователя типа String
      * @return возвращает объект типа User
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
@@ -64,39 +68,56 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод сохраняет запись таблицы user.
+     *
      * @param obj экземпляр класса User
      * @return возвращает количество изменённых записей
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int save(User obj) throws SQLException, InterruptedException {
-        return jdbcUserRepository.save(obj);
+    public int save(UserCreateRequest obj) throws SQLException, InterruptedException {
+        User user = User.builder()
+                .userName(obj.userName())
+                .email(obj.email())
+                .firstName(obj.firstName())
+                .lastName(obj.lastName())
+                .age(obj.age())
+                .build();
+        return jdbcUserRepository.save(user);
     }
 
     /**
      * Метод изменяет запись таблицы по её уникальному идентификатору.
-     * @param id идентификатор типа Long
+     *
+     * @param id  идентификатор типа Long
      * @param obj экземпляр класса User
      * @return возвращает количество изменённых записей
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int update(Long id, User obj) throws SQLException, InterruptedException {
-        return jdbcUserRepository.update(id, obj);
+    public int update(Long id, UserUpdateRequest obj) throws SQLException, InterruptedException {
+
+        User user = jdbcUserRepository.findById(id);
+
+        user.setFirstName(obj.firstName());
+        user.setLastName(obj.lastName());
+        user.setAge(obj.age());
+
+        return jdbcUserRepository.update(id, user);
     }
 
     /**
      * Метод удаляет запись из таблицы по её уникальному идентификатору.
+     *
      * @param id идентификатор типа Long
      * @return возвращает количество удалённых записей
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
@@ -107,9 +128,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод создаёт таблицу users
+     *
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
-     * *
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
      */
     @Override
     public void createTable() throws SQLException, InterruptedException {
@@ -118,9 +140,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод удаляет таблицу users
+     *
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
-     * *
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
      */
     @Override
     public void dropTable() throws SQLException, InterruptedException {
@@ -129,11 +152,12 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод проверяет наличие записи электронной почты в таблице users.
+     *
      * @param email электронная почта пользователя типа String
      * @return возвращает true или false в зависимости есть ли указанная электронная почта в таблице или нет.
      * @throws InterruptedException возникает в случае ошибки получения подключения
-     * @throws SQLException возникает в случае ошибки запроса к базе данных
-     * *
+     * @throws SQLException         возникает в случае ошибки запроса к базе данных
+     *                              *
      */
     @Override
     public boolean emailExist(String email) throws SQLException, InterruptedException {
