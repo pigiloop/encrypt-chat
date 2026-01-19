@@ -1,28 +1,49 @@
 package ru.vinhome.service.integration;
 
 import lombok.NonNull;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.postgresql.util.PSQLException;
+import ru.vinhome.controller.dto.UserCreateRequest;
+import ru.vinhome.controller.dto.UserUpdateRequest;
 import ru.vinhome.model.User;
+import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import ru.vinhome.service.UserServiceImpl;
+import ru.vinhome.util.ConnectionUtil;
+import ru.vinhome.util.PostgresTestContainer;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UserServiceTest {
+public class UserServiceTestIntegration {
 
     private static ArrayList<User> users = null;
 
+    @BeforeAll
+    static void startContainer() {
+        PostgresTestContainer.start();
+        ConnectionUtil.reloadPool();
+    }
+
+    @AfterAll
+    static void stopContainer() {
+        PostgresTestContainer.stop();
+    }
+
     @BeforeEach
     void createTable() throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
+
         userService.createTable();
 
         users = new ArrayList<>();
@@ -37,23 +58,29 @@ public class UserServiceTest {
                 "Cherpanov", "qwerty", 23));
 
         for (User user : users) {
-            userService.save(user);
+//            userService.save(user);
         }
     }
 
     @AfterEach
     void dropTable() throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
+
         userService.dropTable();
     }
 
     @ParameterizedTest
     @CsvSource({
-            "4, kvin, ko@mail.ru, Konstantin, Vinogradov, 18, 1, false",
-            "6, plotnik, alex@mail.ru, Alexey, Lobanov, 22, 1, false"
+            "4, kvin, ko@mail.ru, Konstantin, Vinogradov, passP123dssaaa, 18, 1, false",
+            "6, plotnik, alex@mail.ru, Alexey, Lobanov, passP123dssaaa, 22, 1, false"
     })
     public void save(String id, @NonNull String userName, String email, String fName,
-                     String lName, String age, int result, Boolean isException) throws SQLException, InterruptedException {
+                     String lName, String password, int age, int result, Boolean isException) throws SQLException, InterruptedException {
+
+        UserCreateRequest userCreateRequest = new UserCreateRequest(
+                userName, email, fName, lName, password, age
+        );
 
         User user = User.builder()
                 .id(Long.valueOf(id))
@@ -61,23 +88,25 @@ public class UserServiceTest {
                 .email(email)
                 .firstName(fName)
                 .lastName(lName)
-                .age(Integer.parseInt(age))
+                .age(age)
                 .build();
 
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
 
         if (isException) {
-            Exception exception = assertThrows(PSQLException.class, () -> userService.save(user));
+            Exception exception = assertThrows(PSQLException.class, () -> userService.save(userCreateRequest));
             Assertions.assertEquals("ERROR: duplicate key value violates unique constraint \"users_email_key\"\n"
                     + "  Detail: Key (email)=(ko@mail.ru) already exists.", exception.getMessage());
         } else {
-            Assertions.assertEquals(result, userService.save(user));
+            Assertions.assertEquals(result, userService.save(userCreateRequest));
         }
     }
 
     @Test
     public void findAllTest() throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
 
         ArrayList<User> usersResult = userService.findAll();
 
@@ -94,7 +123,8 @@ public class UserServiceTest {
             "16384, false"
     })
     public void findByIdTest(String id, String hasResult) throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
 
         int index = Integer.parseInt(id);
         User user = userService.findById(Long.parseLong(id));
@@ -115,7 +145,8 @@ public class UserServiceTest {
             "null, failUser"
     })
     public void findByUsernameTest(final String strIndex, final String username) throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
         User user = userService.findByUsername(username);
 
         if (strIndex.equals("null")) {
@@ -131,7 +162,8 @@ public class UserServiceTest {
             "cherepok@mail.ru, true", "nuskov@mail.ru, true", "cherepok@mail.ru, true", "ko@mail.ru, false"
     })
     public void emailExistsTest(String email, String result) throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
 
         Assertions.assertEquals(userService.emailExist(email), Boolean.valueOf(result));
     }
@@ -141,25 +173,31 @@ public class UserServiceTest {
             "1", "2", "3"
     })
     public void deleteTest(String id) throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
         Assertions.assertEquals(
                 1, userService.delete(Long.valueOf(id)));
     }
 
     @ParameterizedTest
     @CsvSource({
-            "1, update",
-            "2, update",
-            "3, update"
+            "1, update, 25",
+            "2, update, 25",
+            "3, update, 24"
     })
-    public void updateTest(String id, String update) throws SQLException, InterruptedException {
-        UserServiceImpl userService = new UserServiceImpl();
+    public void updateTest(String id, String update, int age) throws SQLException, InterruptedException {
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
 
         User user = users.get(Integer.parseInt(id) - 1);
         user.setFirstName(update);
         user.setLastName(update);
 
-        Assertions.assertEquals(1, userService.update(Long.parseLong(id), user));
+        UserUpdateRequest userUpdateRequest =
+                new UserUpdateRequest(update, update, age);
+
+
+        Assertions.assertEquals(1, userService.update(Long.parseLong(id), userUpdateRequest));
         Assertions.assertEquals(
                 users.get(Integer.parseInt(id) - 1),
                 userService.findById(Long.parseLong(id))

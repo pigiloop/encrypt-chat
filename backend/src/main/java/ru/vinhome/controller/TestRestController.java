@@ -8,11 +8,20 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 
-@Path("/v1/test")
+/**
+ * Класс api сервиса для тестирования Rest контроллера.
+ *
+ */
+@Path("/v2/test")
 @Produces(MediaType.TEXT_PLAIN)
 @Consumes(MediaType.TEXT_PLAIN)
 public class TestRestController {
 
+
+    /**
+     * Метод заглушка выдающий положительный ответ
+     * @return возвращает положительный ответ с кодом 200
+     */
     @GET
     public Response get() {
         return Response

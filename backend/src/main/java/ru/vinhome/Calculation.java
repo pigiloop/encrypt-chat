@@ -27,9 +27,21 @@ import java.util.regex.Pattern;
  */
 public class Calculation {
 
+    /**
+     * Приватный конструктор.
+     * Создан для того чтобы не создавался конструктор по умолчанию.
+     *
+     */
     private Calculation() {
     }
 
+    /**
+     * Точка входа в класс Calculation.
+     * Создан как пример
+     *
+     * @param args входные аргументы, в программе никак не используются
+     * @throws IOException выкидывает исключение в случае ошибки ввода вывода
+     */
     public static void main(String[] args) throws IOException {
         File file = new File("lines.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -43,6 +55,13 @@ public class Calculation {
         }
     }
 
+    /**
+     * Проверяет соответствие строки паттерну
+     *
+     * @param line проверяемое значение
+     * @return сумма аргументов в виде {@code long} (если результат выходит за пределы int,
+     * переполнения не произойдет)
+     */
     private static boolean isValid(String line) {
         Pattern pattern = Pattern.compile("(?<city>[A-Za-z ]+), (?<state>[A-Z]{2}): (?<areaCode>[0-9]{3})");
         Matcher matcher = pattern.matcher(line);

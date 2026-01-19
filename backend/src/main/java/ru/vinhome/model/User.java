@@ -6,19 +6,49 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+/**
+ * Класс модели User.
+ * В этом классе реализуется модель User. В нём реализована структура хранения данных о пользователе.
+ *
+ */
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    @NonNull
+    /**
+     * Идентификатор пользователя
+     */
     private Long id;
+
+    /**
+     * Логин пользователя
+     */
     @NonNull
     private String userName;
-    private String email;
-    private String firstName;
-    private String lastName;
-    private String password;
-    private int age;
 
+    /**
+     * Электронная почта пользователя
+     */
+    private String email;
+
+    /**
+     * Имя пользователя
+     */
+    private String firstName;
+
+    /**
+     * Фамилия пользователя
+     */
+    private String lastName;
+
+    /**
+     * Пароль пользователя
+     */
+    private String password;
+
+    /**
+     * Возраст пользователя
+     */
+    private int age;
 }
