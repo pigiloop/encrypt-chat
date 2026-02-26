@@ -64,12 +64,17 @@ class ChatAPI {
 
 
     // Методы для работы с пользователями
-    async createUser(username, displayName) {
-        console.log(`[ChatAPI] Creating user: username=${username}, displayName=${displayName}`);
+    async createUser(username, email, firstName, lastName, age) {
+        console.log(`[ChatAPI] Creating user: username=${username}, 
+        email=${email}, firstName=${firstName}, lastName=${lastName}, age=${age}`);
 
         const payload = {
-            username: username,
-            displayName: displayName
+            userName: username,
+            email: email,
+            firstName: firstName,
+            lastName: lastName,
+            password: "Qwerty12345678Abc",
+            age: age
         };
 
         console.log(`[ChatAPI] User creation payload:`, payload);
@@ -106,7 +111,6 @@ class ChatAPI {
     }
 
     // Методы для работы с сообщениями
-    // Методы для работы с сообщениями
     async sendMessage(fromUserId, toUserId, messageText) {
         console.log(`[ChatAPI] ===== SENDING MESSAGE =====`);
         console.log(`[ChatAPI] fromUserId: ${fromUserId} (type: ${typeof fromUserId})`);
@@ -115,11 +119,9 @@ class ChatAPI {
         console.log(`[ChatAPI] messageText length: ${messageText?.length}`);
 
         const payload = {
-            date: new Date().toISOString(),
-            from: fromUserId,
-            to: toUserId,
-            data: messageText,
-            type: 'STRING'
+            sender: fromUserId,
+            recipient: toUserId,
+            message: messageText
         };
 
         console.log(`[ChatAPI] Full payload:`, payload);
@@ -217,8 +219,8 @@ class DistributedChatAPI {
 
             // Объединяем и дедуплицируем сообщения по ID
             const allMessages = [
-                ...(localResponse.data || []),
-                ...(remoteResponse.data || [])
+                ...(localResponse || []),
+                ...(remoteResponse || [])
             ];
 
             console.log(`[DistributedChatAPI] Total messages before deduplication: ${allMessages.length}`);
@@ -232,7 +234,7 @@ class DistributedChatAPI {
 
             // Сортируем по дате
             const sorted = uniqueMessages.sort((a, b) =>
-                new Date(a.date) - new Date(b.date)
+                new Date(a.createdAt) - new Date(b.createdAt)
             );
 
             return sorted;
@@ -252,17 +254,17 @@ class DistributedChatAPI {
 
 
     // Создать пользователя на обоих бэкендах
-    async createUser(username, displayName) {
+    async createUser(username, email, firstName, lastName, age) {
         console.log(`[DistributedChatAPI] Creating user on both backends`);
 
         try {
             console.log(`[DistributedChatAPI] Creating on local backend...`);
-            const localResponse = await this.localAPI.createUser(username, displayName);
+            const localResponse = await this.localAPI.createUser(username, email, firstName, lastName, age);
             console.log(`[DistributedChatAPI] Local creation successful:`, localResponse);
 
             try {
                 console.log(`[DistributedChatAPI] Creating on remote backend...`);
-                const remoteResponse = await this.remoteAPI.createUser(username, displayName);
+                const remoteResponse = await this.remoteAPI.createUser(username, email, firstName, lastName, age);
                 console.log(`[DistributedChatAPI] Remote creation successful:`, remoteResponse);
             } catch (remoteError) {
                 console.warn(`[DistributedChatAPI] Remote creation failed (non-critical):`, remoteError);
@@ -282,7 +284,7 @@ class DistributedChatAPI {
         try {
             const localResponse = await this.localAPI.getAllUsers();
             console.log(`[DistributedChatAPI] Users fetched:`, localResponse);
-            return localResponse.data || [];
+            return localResponse || [];
         } catch (error) {
             console.error(`[DistributedChatAPI] Failed to fetch users:`, error);
             return [];

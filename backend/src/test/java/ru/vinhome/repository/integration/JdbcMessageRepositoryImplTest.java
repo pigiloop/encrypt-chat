@@ -16,7 +16,6 @@ import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import ru.vinhome.util.ConnectionUtil;
 import ru.vinhome.util.PostgresTestContainer;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -40,14 +39,13 @@ public class JdbcMessageRepositoryImplTest {
     }
 
     @BeforeEach
-    void createTable() throws SQLException, InterruptedException, URISyntaxException, IOException {
+    void createTable() throws SQLException, InterruptedException, URISyntaxException {
 
         PostgresTestContainer.initSQL(Paths.get(ContainerTest.class.getClassLoader().getResource("init_db.sql").toURI()));
 
         JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
 
-        messages = new ArrayList<>();
-        messages.addAll(jdbcMessageRepository.findAll());
+        messages = jdbcMessageRepository.findAll();
     }
 
     @AfterEach
@@ -66,15 +64,13 @@ public class JdbcMessageRepositoryImplTest {
             "8, 2, 3, Отлично тогда ты платишь, 1",
             "9, 2, 3, Договорились но тогда мы идём без тебя ))), 1"
     })
-    public void insertDataTest(String id, String strSender, String strRecipient, String text, int result)
-            throws SQLException, InterruptedException, URISyntaxException {
-
-        JdbcUserRepositoryImpl jdbcUserRep = new JdbcUserRepositoryImpl();
+    public void insertDataTest(int id, int senderId, int recipientId, String text, int result)
+            throws SQLException, InterruptedException {
 
         Message message = Message.createMessage(
-                Long.valueOf(id),
-                jdbcUserRep.findById(Long.valueOf(strSender)),
-                jdbcUserRep.findById(Long.valueOf(strRecipient)),
+                id,
+                senderId,
+                recipientId,
                 text,
                 null);
 
@@ -103,14 +99,13 @@ public class JdbcMessageRepositoryImplTest {
             "3, true",
             "40000, false"
     })
-    public void findByIdTest(String id, String isTrue) throws SQLException, InterruptedException {
+    public void findByIdTest(int id, String isTrue) throws SQLException, InterruptedException {
         JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
 
-        int index = Integer.valueOf(id);
-        Message message = jdbcMessageRepository.findById(Long.valueOf(index));
+        Message message = jdbcMessageRepository.findById(id);
 
         if (isTrue.equals("true")) {
-            Assertions.assertEquals(messages.get(index - 1), message);
+            Assertions.assertEquals(messages.get(id - 1), message);
         } else {
             Assertions.assertNull(message);
         }
@@ -120,10 +115,10 @@ public class JdbcMessageRepositoryImplTest {
     @CsvSource({
             "1", "2", "3"
     })
-    public void deleteTest(String id) throws SQLException, InterruptedException {
+    public void deleteTest(int id) throws SQLException, InterruptedException {
         JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
         Assertions.assertEquals(
-                1, jdbcMessageRepository.delete(Long.valueOf(id)));
+                1, jdbcMessageRepository.delete(id));
     }
 
 
@@ -132,17 +127,17 @@ public class JdbcMessageRepositoryImplTest {
             "1, update",
             "2, update"
     })
-    public void updateTest(String id, String update) throws SQLException, InterruptedException {
+    public void updateTest(int id, String update) throws SQLException, InterruptedException {
         JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
 
-        Message message = jdbcMessageRepository.findById(Long.valueOf(id));
+        Message message = jdbcMessageRepository.findById(id);
         message.setMessage(update);
-        messages.get(Integer.parseInt(id) - 1).setMessage(update);
+        messages.get(id - 1).setMessage(update);
 
-        Assertions.assertEquals(1, jdbcMessageRepository.update(Long.parseLong(id), message));
+        Assertions.assertEquals(1, jdbcMessageRepository.update(id, message));
         Assertions.assertEquals(
-                messages.get(Integer.parseInt(id) - 1),
-                jdbcMessageRepository.findById(Long.parseLong(id))
+                messages.get(id - 1),
+                jdbcMessageRepository.findById(id)
         );
 
     }

@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
+import ru.vinhome.controller.dto.MessageCreateRequest;
+import ru.vinhome.controller.dto.MessageUpdateRequest;
 import ru.vinhome.model.Message;
 import ru.vinhome.model.User;
 import ru.vinhome.repository.JdbcMessageRepositoryImpl;
-import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import ru.vinhome.service.MessageServiceImpl;
-import ru.vinhome.service.UserServiceImpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,68 +21,57 @@ public class MessageServiceTestUnit {
     private static ArrayList<Message> messages = null;
     private static ArrayList<User> users = null;
 
+
     @BeforeEach
-    void createTable() throws SQLException, InterruptedException {
+    void createTable() {
 
         createAndFillUserTable();
 
         messages = new ArrayList<>();
 
-        messages.add(Message.createMessage(1L, users.get(0), users.get(1),
+        messages.add(Message.createMessage(1, users.get(0).getId(), users.get(1).getId(),
                 "Привет, друг! Как твои делишки?", null));
-        messages.add(Message.createMessage(2L, users.get(1), users.get(0),
+        messages.add(Message.createMessage(2, users.get(1).getId(), users.get(0).getId(),
                 "Привет, отлично! Как ты сам?", null));
-        messages.add(Message.createMessage(3L, users.get(0), users.get(1),
+        messages.add(Message.createMessage(3, users.get(0).getId(), users.get(1).getId(),
                 "Да так развлекаюсь, Паша интересные задачки подкинул, вот сижу тут развлекаюсь!", null));
-        messages.add(Message.createMessage(4L, users.get(1), users.get(0),
+        messages.add(Message.createMessage(4, users.get(1).getId(), users.get(0).getId(),
                 "Понял тебя, держись там.", null));
-        messages.add(Message.createMessage(5L, users.get(2), users.get(0),
+        messages.add(Message.createMessage(5, users.get(2).getId(), users.get(0).getId(),
                 "Привет, а вы про меня совсем забыли?", null));
     }
 
 
-    private static void createAndFillUserTable() throws SQLException, InterruptedException {
+    private static void createAndFillUserTable() {
         users = new ArrayList<>();
 
-        users.add(new User(1L, "user1", "klepeshkin@mail.ru", "Konstantin",
+
+        users.add(new User(1, "user1", "klepeshkin@mail.ru", "Konstantin",
                 "Lepeshkin", "qwerty", 18));
-        users.add(new User(2L, "user2", "nuskov@mail.ru", "Nikita",
+        users.add(new User(2, "user2", "nuskov@mail.ru", "Nikita",
                 "Uskov", "qwerty", 25));
-        users.add(new User(3L, "user3", "cherepok@mail.ru", "Oleg",
+        users.add(new User(3, "user3", "cherepok@mail.ru", "Oleg",
                 "Cherpanov", "qwerty", 23));
     }
 
     @ParameterizedTest
     @CsvSource({
-            "7, 3, 2, Сегодня идём есть пиццу, 1",
-            "8, 2, 3, Отлично тогда ты платишь, 1",
-            "9, 2, 3, Договорились но тогда мы идём без тебя ))), 1"
+            "3, 2, Сегодня идём есть пиццу, 1",
+            "2, 3, Отлично тогда ты платишь, 1",
+            "2, 3, Договорились но тогда мы идём без тебя ))), 1"
     })
-    public void insertDataTest(String id, String strSender, String strRecipient, String text, int result)
+    public void insertDataTest(int senderId, int recipientId, String text, int result)
             throws SQLException, InterruptedException {
 
-        final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
-        UserServiceImpl userService = new UserServiceImpl(userRepository);
-
-        Long sender = Long.parseLong(strSender);
-        Long recipient = Long.parseLong(strRecipient);
-
-        Mockito.when(userRepository.findById(sender)).thenReturn(users.get(Integer.parseInt(strSender) - 1));
-        Mockito.when(userRepository.findById(recipient)).thenReturn(users.get(Integer.parseInt(strRecipient) - 1));
-
-        Message message = Message.createMessage(
-                Long.valueOf(id),
-                userService.findById(Long.valueOf(strSender)),
-                userService.findById(Long.valueOf(strRecipient)),
-                text,
-                null);
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(senderId, recipientId, text);
 
         final var messageRepository = Mockito.mock(JdbcMessageRepositoryImpl.class);
         MessageServiceImpl messageService = new MessageServiceImpl(messageRepository);
 
-        Mockito.when(messageRepository.save(message)).thenReturn(1);
+        Mockito.when(messageService.save(messageCreateRequest)).thenReturn(1);
 
-        Assertions.assertEquals(result, messageService.save(message));
+        Assertions.assertEquals(result,
+                messageService.save(messageCreateRequest));
 
     }
 
@@ -95,6 +84,7 @@ public class MessageServiceTestUnit {
         Mockito.when(messageService.findAll()).thenReturn(messages);
         ArrayList<Message> messageArrayList = messageService.findAll();
 
+
         Assertions.assertEquals(messages.get(0), messageArrayList.get(0));
         Assertions.assertEquals(messages.get(1), messageArrayList.get(1));
         Assertions.assertEquals(messages.get(2), messageArrayList.get(2));
@@ -106,32 +96,30 @@ public class MessageServiceTestUnit {
     @CsvSource({
             "1", "2", "3",
     })
-    public void findByIdTestPositive(String id) throws SQLException, InterruptedException {
+    public void findByIdTestPositive(int id) throws SQLException, InterruptedException {
 
         final var messageRepository = Mockito.mock(JdbcMessageRepositoryImpl.class);
         MessageServiceImpl messageService = new MessageServiceImpl(messageRepository);
 
-        int index = Integer.parseInt(id);
+        Mockito.when(messageService.findById(id)).thenReturn(messages.get(id - 1));
 
-        Mockito.when(messageService.findById(Long.parseLong(id))).thenReturn(messages.get(index - 1));
+        Message message = messageService.findById(id);
 
-        Message message = messageService.findById(Long.parseLong(id));
-
-        Assertions.assertEquals(messages.get(index - 1), message);
+        Assertions.assertEquals(messages.get(id - 1), message);
     }
 
     @ParameterizedTest
     @CsvSource({
             "40000"
     })
-    public void findByIdTestNegative(String id) throws SQLException, InterruptedException {
+    public void findByIdTestNegative(int id) throws SQLException, InterruptedException {
 
         final var messageRepository = Mockito.mock(JdbcMessageRepositoryImpl.class);
         MessageServiceImpl messageService = new MessageServiceImpl(messageRepository);
 
-        Mockito.when(messageService.findById(Long.parseLong(id))).thenReturn(null);
+        Mockito.when(messageService.findById(id)).thenReturn(null);
 
-        Message message = messageService.findById(Long.parseLong(id));
+        Message message = messageService.findById(id);
         Assertions.assertNull(message);
     }
 
@@ -139,14 +127,14 @@ public class MessageServiceTestUnit {
     @CsvSource({
             "1", "2", "3"
     })
-    public void deleteTest(String id) throws SQLException, InterruptedException {
+    public void deleteTest(int id) throws SQLException, InterruptedException {
         final var messageRepository = Mockito.mock(JdbcMessageRepositoryImpl.class);
         MessageServiceImpl messageService = new MessageServiceImpl(messageRepository);
 
-        Mockito.when(messageRepository.delete(Long.parseLong(id))).thenReturn(1);
+        Mockito.when(messageRepository.delete(id)).thenReturn(1);
 
         Assertions.assertEquals(
-                1, messageService.delete(Long.valueOf(id)));
+                1, messageService.delete(id));
     }
 
 
@@ -155,26 +143,19 @@ public class MessageServiceTestUnit {
             "1, update",
             "2, update"
     })
-    public void updateTest(String id, String update) throws SQLException, InterruptedException {
+    public void updateTest(int id, String update) throws SQLException, InterruptedException {
         final var messageRepository = Mockito.mock(JdbcMessageRepositoryImpl.class);
         MessageServiceImpl messageService = new MessageServiceImpl(messageRepository);
 
-        Mockito.when(messageRepository.findById(Long.parseLong(id))).thenReturn(messages.get(Integer.parseInt(id) - 1));
+        Mockito.when(messageRepository.findById(id)).thenReturn(messages.get(id - 1));
 
-        Message message = messageService.findById(Long.valueOf(id));
+        MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(update);
 
+        messages.get(id - 1).setMessage(update);
 
-        message.setMessage(update);
-        messages.get(Integer.parseInt(id) - 1).setMessage(update);
+        Mockito.when(messageService.update(id, messageUpdateRequest)).thenReturn(1);
 
-        Mockito.when(messageRepository.update(Long.parseLong(id), message)).thenReturn(1);
-
-        Assertions.assertEquals(1, messageService.update(Long.parseLong(id), message));
-        Assertions.assertEquals(
-                messages.get(Integer.parseInt(id) - 1),
-                messageService.findById(Long.parseLong(id))
-        );
-
+        Assertions.assertEquals(1, messageService.update(id, messageUpdateRequest));
     }
 
 }

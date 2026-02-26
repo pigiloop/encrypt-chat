@@ -4,7 +4,6 @@ import jakarta.ws.rs.ApplicationPath;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
-import org.glassfish.jersey.server.validation.ValidationFeature;
 import ru.vinhome.interceptor.LoggingInterceptor;
 
 /**

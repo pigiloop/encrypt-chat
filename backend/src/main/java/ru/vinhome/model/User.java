@@ -19,7 +19,7 @@ public class User {
     /**
      * Идентификатор пользователя
      */
-    private Long id;
+    private int id;
 
     /**
      * Логин пользователя

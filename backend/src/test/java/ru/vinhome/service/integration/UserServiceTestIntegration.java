@@ -48,17 +48,17 @@ public class UserServiceTestIntegration {
 
         users = new ArrayList<>();
 
-        users.add(new User(1L, "user1", "klepeshkin@mail.ru", "Konstantin",
+        users.add(new User(1, "user1", "klepeshkin@mail.ru", "Konstantin",
                 "Lepeshkin", "qwerty", 18));
 
-        users.add(new User(2L, "user2", "nuskov@mail.ru", "Nikita",
+        users.add(new User(2, "user2", "nuskov@mail.ru", "Nikita",
                 "Uskov", "qwerty", 25));
 
-        users.add(new User(3L, "user3", "cherepok@mail.ru", "Oleg",
+        users.add(new User(3, "user3", "cherepok@mail.ru", "Oleg",
                 "Cherpanov", "qwerty", 23));
 
         for (User user : users) {
-//            userService.save(user);
+            userService.save(UserCreateRequest.mapFromUser(user));
         }
     }
 
@@ -75,21 +75,12 @@ public class UserServiceTestIntegration {
             "4, kvin, ko@mail.ru, Konstantin, Vinogradov, passP123dssaaa, 18, 1, false",
             "6, plotnik, alex@mail.ru, Alexey, Lobanov, passP123dssaaa, 22, 1, false"
     })
-    public void save(String id, @NonNull String userName, String email, String fName,
+    public void save(int id, @NonNull String userName, String email, String fName,
                      String lName, String password, int age, int result, Boolean isException) throws SQLException, InterruptedException {
 
         UserCreateRequest userCreateRequest = new UserCreateRequest(
                 userName, email, fName, lName, password, age
         );
-
-        User user = User.builder()
-                .id(Long.valueOf(id))
-                .userName(userName)
-                .email(email)
-                .firstName(fName)
-                .lastName(lName)
-                .age(age)
-                .build();
 
         JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
         UserServiceImpl userService = new UserServiceImpl(userRepository);
@@ -122,16 +113,15 @@ public class UserServiceTestIntegration {
             "3, true",
             "16384, false"
     })
-    public void findByIdTest(String id, String hasResult) throws SQLException, InterruptedException {
+    public void findByIdTest(int id, String hasResult) throws SQLException, InterruptedException {
         JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
         UserServiceImpl userService = new UserServiceImpl(userRepository);
 
-        int index = Integer.parseInt(id);
-        User user = userService.findById(Long.parseLong(id));
+        User user = userService.findById(id);
 
 
         if (hasResult.equals("true")) {
-            Assertions.assertEquals(users.get(index - 1), user);
+            Assertions.assertEquals(users.get(id - 1), user);
         } else {
             Assertions.assertNull(user);
         }
@@ -141,20 +131,26 @@ public class UserServiceTestIntegration {
     @CsvSource({
             "0, user1",
             "1, user2",
-            "2, user3",
-            "null, failUser"
+            "2, user3"
     })
-    public void findByUsernameTest(final String strIndex, final String username) throws SQLException, InterruptedException {
+    public void findByUsernameTestPositive(final int index, final String username) throws SQLException, InterruptedException {
         JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
         UserServiceImpl userService = new UserServiceImpl(userRepository);
         User user = userService.findByUsername(username);
 
-        if (strIndex.equals("null")) {
-            Assertions.assertNull(user);
-        } else {
-            int index = Integer.parseInt(strIndex);
-            Assertions.assertEquals(users.get(index), user);
-        }
+        Assertions.assertEquals(users.get(index), user);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "failUser"
+    })
+    public void findByUsernameTestNegative(final String username) throws SQLException, InterruptedException {
+        JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
+        UserServiceImpl userService = new UserServiceImpl(userRepository);
+        User user = userService.findByUsername(username);
+
+        Assertions.assertNull(user);
     }
 
     @ParameterizedTest
@@ -172,11 +168,11 @@ public class UserServiceTestIntegration {
     @CsvSource({
             "1", "2", "3"
     })
-    public void deleteTest(String id) throws SQLException, InterruptedException {
+    public void deleteTest(int id) throws SQLException, InterruptedException {
         JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
         UserServiceImpl userService = new UserServiceImpl(userRepository);
         Assertions.assertEquals(
-                1, userService.delete(Long.valueOf(id)));
+                1, userService.delete(id));
     }
 
     @ParameterizedTest
@@ -185,22 +181,23 @@ public class UserServiceTestIntegration {
             "2, update, 25",
             "3, update, 24"
     })
-    public void updateTest(String id, String update, int age) throws SQLException, InterruptedException {
+    public void updateTest(int id, String update, int age) throws SQLException, InterruptedException {
         JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
         UserServiceImpl userService = new UserServiceImpl(userRepository);
 
-        User user = users.get(Integer.parseInt(id) - 1);
+        User user = users.get(id - 1);
+
         user.setFirstName(update);
         user.setLastName(update);
+        user.setAge(age);
 
         UserUpdateRequest userUpdateRequest =
-                new UserUpdateRequest(update, update, age);
+                UserUpdateRequest.mapFromUser(user);
 
-
-        Assertions.assertEquals(1, userService.update(Long.parseLong(id), userUpdateRequest));
+        Assertions.assertEquals(1, userService.update(id, userUpdateRequest));
         Assertions.assertEquals(
-                users.get(Integer.parseInt(id) - 1),
-                userService.findById(Long.parseLong(id))
+                users.get(id - 1),
+                userService.findById(id)
         );
     }
 

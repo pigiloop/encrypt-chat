@@ -1,10 +1,11 @@
 package ru.vinhome.util;
 
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayDeque;
 
 /**
  * Утилитный класс ConnectionUtil реализующий подключение к базе данных.
@@ -17,32 +18,15 @@ public final class ConnectionUtil {
      * Коллекция соединений типа ArrayDeque. Содержит коллекцию соединений.
      *
      */
-    public static final ArrayDeque<Connection> CONNECTION_POOL = new ArrayDeque<>();
+    public static HikariDataSource hikariDataSource = null;
 
-    /**
-     * URL подключения к базе данных.
-     *
-     */
-    private static final String URL = PropertiesUtil.get("db.url.ip");
-
-    /**
-     * Имя пользователя в базе данных.
-     *
-     */
-    private static final String USERNAME = PropertiesUtil.get("db.username");
-
-    /**
-     * Пароль к базе данных.
-     *
-     */
-    private static final String PASSWORD = PropertiesUtil.get("db.password");
 
     /**
      * Задаёт размер пула
      *
      */
     private static final Integer POOL_SIZE = PropertiesUtil.
-            getPropertyToIntOrDefault("db.connection.pool.size", "5");
+            getPropertiesFromSystemEnvOrPropertiesToInt("db.connection.pool.size", "5");
 
     static {
         initPool();
@@ -54,14 +38,20 @@ public final class ConnectionUtil {
      *
      */
     private static void initPool() {
+        /**
+         * jdbcUrl=jdbc:postgresql://localhost:5432/postgres
+         * username=postgres
+         * password=admin
+         * driverClassName=org.postgresql.Driver
+         *
+         * poolName=app-pg-pool
+         * maximumPoolSize=20
+         * minimumIdle=5
+         * schema=public
+         */
+        final var config = new HikariConfig(PropertiesUtil.getHikariProperties("dataSource."));
+        hikariDataSource = new HikariDataSource(config);
 
-        for (int i = 0; i < POOL_SIZE; i++) {
-            try {
-                CONNECTION_POOL.addLast(connection());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     /**
@@ -70,7 +60,7 @@ public final class ConnectionUtil {
      *
      */
     public static void reloadPool() {
-        CONNECTION_POOL.clear();
+        hikariDataSource.close();
         initPool();
     }
 
@@ -84,38 +74,13 @@ public final class ConnectionUtil {
     }
 
     /**
-     * Метод перезагрузки пула.
-     * Используется при тестировании системы.
-     *
-     */
-    private static Connection connection() throws SQLException {
-        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
-    }
-
-    /**
      * Статичный метод, получаем экземпляр подключения к базе данных.
      *
      * @return Возвращает подключение типа Connection из библиотеки java.sql
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
+     * @throws SQLException выкидывает исключение если имеются проблемы с подключением
      * @see Connection
      */
-    public static Connection getConnection() throws InterruptedException {
-        while (CONNECTION_POOL.isEmpty()) {
-            Thread.sleep(5_000);
-        }
-        return CONNECTION_POOL.pollFirst();
-    }
-
-    /**
-     * Статичный метод, возвращает подключение к базе данных.
-     *
-     * @param connection соединение, которое возвращаем данным методом.
-     *
-     */
-    public static void returnConnection(final Connection connection) {
-        if (CONNECTION_POOL.contains(connection)) {
-            return;
-        }
-        CONNECTION_POOL.addLast(connection);
+    public static Connection getConnection() throws SQLException {
+        return hikariDataSource.getConnection();
     }
 }

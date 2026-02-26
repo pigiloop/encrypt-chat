@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
      * *
      */
     @Override
-    public User findById(Long id) throws SQLException, InterruptedException {
+    public User findById(Integer id) throws SQLException, InterruptedException {
         return jdbcUserRepository.findById(id);
     }
 
@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
                 .email(obj.email())
                 .firstName(obj.firstName())
                 .lastName(obj.lastName())
+                .password(obj.password())
                 .age(obj.age())
                 .build();
         return jdbcUserRepository.save(user);
@@ -100,7 +101,7 @@ public class UserServiceImpl implements UserService {
      * *
      */
     @Override
-    public int update(Long id, UserUpdateRequest obj) throws SQLException, InterruptedException {
+    public int update(Integer id, UserUpdateRequest obj) throws SQLException, InterruptedException {
 
         User user = jdbcUserRepository.findById(id);
 
@@ -122,7 +123,7 @@ public class UserServiceImpl implements UserService {
      * *
      */
     @Override
-    public int delete(Long id) throws SQLException, InterruptedException {
+    public int delete(Integer id) throws SQLException, InterruptedException {
         return jdbcUserRepository.delete(id);
     }
 

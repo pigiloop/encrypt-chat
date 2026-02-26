@@ -103,4 +103,25 @@ public class MessageServiceControllerTest {
         System.out.println(httpResponse);
     }
 
+    @Test
+    void save() throws IOException, InterruptedException {
+
+        String message = """
+                  {
+                    "senderId": 2,
+                    "recipientId": 1,
+                    "message": "Привет, сегодня был чудесный вечер. Он был незабываемый"
+                  }
+                """;
+
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/users/"))
+                .POST(HttpRequest.BodyPublishers.ofString(message))
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .build();
+
+        HttpResponse<String> httpResponse = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(httpResponse.body());
+    }
+
 }

@@ -14,7 +14,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ru.vinhome.controller.dto.UserCreateRequest;
 import ru.vinhome.controller.dto.UserUpdateRequest;
-import ru.vinhome.model.User;
 import ru.vinhome.service.UserService;
 
 
@@ -60,7 +59,7 @@ public class UserRestController {
      */
     @GET
     @Path("/{id}")
-    public Response findById(@PathParam("id") final long id) {
+    public Response findById(@PathParam("id") final int id) {
         try {
             try {
                 return Response.ok()
@@ -134,7 +133,7 @@ public class UserRestController {
      */
     @PUT
     @Path("/{id}")
-    public Response update(@PathParam("id") final Long id, @Valid final UserUpdateRequest userUpdateRequest) {
+    public Response update(@PathParam("id") final int id, @Valid final UserUpdateRequest userUpdateRequest) {
 
         try {
             userService.update(id, userUpdateRequest);
@@ -156,7 +155,7 @@ public class UserRestController {
      */
     @DELETE
     @Path("/{id}")
-    public Response delete(@PathParam("id") final long id) {
+    public Response delete(@PathParam("id") final int id) {
         try {
             return Response.status(Response.Status.OK)
                     .entity(userService.delete(id))

@@ -5,7 +5,15 @@ plugins {
     id 'checkstyle'
     id("io.qameta.allure") version "3.0.1"
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 
 group = 'ru.vinhome'
 version = "${backend_module_version}"
@@ -54,7 +62,7 @@ dependencies {
     // server
     implementation "org.eclipse.jetty:jetty-server:${jetty_version}"
     implementation "org.eclipse.jetty.ee10:jetty-ee10-servlet:${jetty_version}"
-
+    implementation 'com.zaxxer:HikariCP:7.0.2'
     implementation "org.glassfish.jersey.core:jersey-server:${jersey_server_version}"
     implementation "org.glassfish.jersey.containers:jersey-container-servlet-core:${jersey_server_version}"
     implementation "org.glassfish.jersey.media:jersey-media-json-jackson:${jersey_server_version}"
@@ -79,6 +87,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${mockito_version}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockito_version}"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
 }
 
 jacoco {
@@ -109,6 +119,31 @@ jacocoTestCoverageVerification {
         }
     }
 }
+
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'ru.vinhome.StartClass'
+        )
+    }
+}
+shadowJar {
+    archiveBaseName.set('my-app')
+    archiveVersion.set('1.0')
+    archiveClassifier.set('all')
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': 'ru.vinhome.StartClass'
+        )
+    }
+}
+
+build {
+    dependsOn shadowJar
+}
+
 
 checkstyle {
     toolVersion = "10.12.4"

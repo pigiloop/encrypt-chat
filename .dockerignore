@@ -1,0 +1,5 @@
+frontend/build
+frontend/node_modules
+frontend/scripts/start.ps1
+frontend/homework
+frontend/Dockerfile

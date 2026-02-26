@@ -1,10 +1,10 @@
 package ru.vinhome.controller.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import ru.vinhome.model.User;
 
 public record UserUpdateRequest(
          @NotBlank(message = "firstname is required")
@@ -18,4 +18,10 @@ public record UserUpdateRequest(
         @Min(value = 18, message = "Age must be more or equals 18 year")
         @Max(value = 120, message = "Age must be less 120 year")
         int age) {
+        public static UserUpdateRequest mapFromUser(final User user) {
+                return new UserUpdateRequest(
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getAge());
+        }
 }

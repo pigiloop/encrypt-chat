@@ -1,5 +1,7 @@
 package ru.vinhome.service;
 
+import ru.vinhome.controller.dto.MessageCreateRequest;
+import ru.vinhome.controller.dto.MessageUpdateRequest;
 import ru.vinhome.model.Message;
 import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 
@@ -65,7 +67,7 @@ public class MessageServiceImpl implements MessageService {
      * *
      */
     @Override
-    public Message findById(Long id) throws SQLException, InterruptedException {
+    public Message findById(Integer id) throws SQLException, InterruptedException {
         return jdbcMessageRepository.findById(id);
     }
 
@@ -80,8 +82,15 @@ public class MessageServiceImpl implements MessageService {
      *
      */
     @Override
-    public int save(Message obj) throws SQLException, InterruptedException {
-        return jdbcMessageRepository.save(obj);
+    public int save(MessageCreateRequest obj) throws SQLException, InterruptedException {
+
+        Message message = Message.builder()
+                .senderId(obj.sender())
+                .recipientId(obj.recipient())
+                .message(obj.message())
+                .build();
+
+        return jdbcMessageRepository.save(message);
     }
 
     /**
@@ -96,8 +105,13 @@ public class MessageServiceImpl implements MessageService {
      * *
      */
     @Override
-    public int update(Long id, Message obj) throws SQLException, InterruptedException {
-        return jdbcMessageRepository.update(id, obj);
+    public int update(Integer id, MessageUpdateRequest obj) throws SQLException, InterruptedException {
+
+        Message message = jdbcMessageRepository.findById(id);
+
+        message.setMessage(obj.message());
+
+        return jdbcMessageRepository.update(id, message);
     }
 
     /**
@@ -110,7 +124,7 @@ public class MessageServiceImpl implements MessageService {
      *                              *
      */
     @Override
-    public int delete(Long id) throws SQLException, InterruptedException {
+    public int delete(Integer id) throws SQLException, InterruptedException {
         return jdbcMessageRepository.delete(id);
     }
 

@@ -1,6 +1,5 @@
 package ru.vinhome.repository;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,18 +30,6 @@ public interface BaseRepository<T, I> {
      *                              *
      */
     T findById(I id) throws SQLException, InterruptedException;
-
-    /**
-     * Метод выводит запись таблицы по её уникальному идентификатору с использованием существующего соединения.
-     *
-     * @param id         идентификатор типа I
-     * @param connection экземпляр соединения типа Connection
-     * @return возвращает объект типа T
-     * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
-     *                              *
-     */
-    T findById(I id, Connection connection) throws SQLException, InterruptedException;
 
     /**
      * Метод сохраняет запись в таблице.

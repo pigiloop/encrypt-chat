@@ -6,7 +6,7 @@ import ru.vinhome.model.User;
 
 import java.sql.SQLException;
 
-public interface UserService extends CrudService<User, UserCreateRequest, UserUpdateRequest, Long>, TableManagement {
+public interface UserService extends CrudService<User, UserCreateRequest, UserUpdateRequest, Integer>, TableManagement {
 
     /**
      * Метод проверяет наличие записи электронной почты в таблице users.

@@ -11,7 +11,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import ru.vinhome.model.Message;
+import ru.vinhome.controller.dto.MessageCreateRequest;
+import ru.vinhome.controller.dto.MessageUpdateRequest;
 import ru.vinhome.service.MessageService;
 
 import java.sql.SQLException;
@@ -54,7 +55,7 @@ public class MessageRestController {
      */
     @GET
     @Path("/{id}")
-    public Response findById(@PathParam("id") final Long id) {
+    public Response findById(@PathParam("id") final Integer id) {
         try {
             return Response.status(Response.Status.OK)
                     .entity(messageService.findById(id))
@@ -73,7 +74,7 @@ public class MessageRestController {
      * сообщение об ошибке
      */
     @POST
-    public Response save(Message message) {
+    public Response save(MessageCreateRequest message) {
         try {
             messageService.save(message);
             return Response.status(Response.Status.CREATED)
@@ -95,7 +96,7 @@ public class MessageRestController {
      */
     @PUT
     @Path("/{id}")
-    public Response update(@PathParam("id") final Long id, final Message message) {
+    public Response update(@PathParam("id") final Integer id, final MessageUpdateRequest message) {
 
         try {
             messageService.update(id, message);
@@ -117,7 +118,7 @@ public class MessageRestController {
      */
     @DELETE
     @Path("/{id}")
-    public Response delete(@PathParam("id") final long id) {
+    public Response delete(@PathParam("id") final int id) {
         try {
             return Response.status(Response.Status.OK)
                     .entity(messageService.delete(id))

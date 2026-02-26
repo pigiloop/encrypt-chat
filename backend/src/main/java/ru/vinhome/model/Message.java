@@ -1,5 +1,6 @@
 package ru.vinhome.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,16 +19,16 @@ public class Message {
     /**
      * Идентификатор сообщения
      */
-    private Long id;
+    private int id;
     /**
      * Отправитель сообщения
      */
-    private User sender;
+    private int senderId;
 
     /**
      * Получатель сообщения
      */
-    private User recipient;
+    private int recipientId;
 
     /**
      * Текст сообщения
@@ -37,21 +38,22 @@ public class Message {
     /**
      * Дата создания сообщения
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
 
     /**
      * Приватный конструктор класса Message.
      * @param id уникальный идентификатор сообщения
-     * @param sender отправитель сообщения
-     * @param recipient получатель сообщения
+     * @param senderId отправитель сообщения
+     * @param recipientId получатель сообщения
      * @param message текст сообщения
      * @param createdAt дата и время создания сообщения
      */
-    private Message(Long id, User sender, User recipient, String message, LocalDateTime createdAt) {
+    private Message(int id, int senderId, int recipientId, String message, LocalDateTime createdAt) {
         this.id = id;
-        this.sender = sender;
-        this.recipient = recipient;
+        this.senderId = senderId;
+        this.recipientId = recipientId;
         this.message = message;
         this.createdAt = createdAt;
     }
@@ -59,21 +61,21 @@ public class Message {
     /**
      * Статический метод создаёт экземпляр объекта класса Message.
      * @param id уникальный идентификатор сообщения
-     * @param sender отправитель сообщения
-     * @param recipient получатель сообщения
+     * @param senderId отправитель сообщения
+     * @param recipientId получатель сообщения
      * @param message текст сообщения
      * @param createdAt дата и время создания сообщения
      * @return Экземпляр объекта класса Message
      */
-    public static Message createMessage(Long id,
-                                        User sender,
-                                        User recipient,
+    public static Message createMessage(int id,
+                                        int senderId,
+                                        int recipientId,
                                         String message,
                                         LocalDateTime createdAt) {
         return new Message(
                 id,
-                sender,
-                recipient,
+                senderId,
+                recipientId,
                 message,
                 createdAt
         );

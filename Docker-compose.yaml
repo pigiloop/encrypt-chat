@@ -1,0 +1,123 @@
+name: encrypt-chat
+
+networks:
+  net_backend_local:
+    driver: bridge
+  net_backend_remote:
+    driver: bridge
+  net_frontend_local:
+    driver: bridge
+  net_frontend_remote:
+    driver: bridge
+
+
+services:
+  postgres_local:
+    image: postgres:18.1-alpine3.22
+    container_name: postgres_local
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: db-encrypt-chat
+    networks:
+      - net_backend_local
+    ports:
+     - "15432:5432"
+    volumes:
+      - type: bind
+        source: .\resources\db_local
+        target: /docker-entrypoint-initdb.d
+
+  postgres_remote:
+    image: postgres:18.1-alpine3.22
+    container_name: postgres_remote
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: db-encrypt-chat
+    networks:
+      - net_backend_remote
+    ports:
+      - "15433:5432"
+    volumes:
+      - type: bind
+        source: .\resources\db_remote
+        target: /docker-entrypoint-initdb.d
+
+
+  backend-local:
+    build:
+      context: .
+      dockerfile: backend\Dockerfile
+    container_name: backend_local
+    environment:
+      jdbcUrl: jdbc:postgresql://postgres_local:5432/db-encrypt-chat
+      maximumPoolSize: 5
+      minimumIdle: 10
+    ports:
+      - "8088:8088"
+    depends_on:
+      - postgres_local
+    networks:
+      - net_backend_local
+      - net_frontend_local
+      - net_frontend_remote
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/api/v1/test"]
+      interval: 0m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+
+  backend-remote:
+    build:
+      context: .
+      dockerfile: backend\Dockerfile
+    container_name: backend_remote
+    environment:
+      jdbcUrl: jdbc:postgresql://postgres_remote:5432/db-encrypt-chat
+      maximumPoolSize: 5
+      minimumIdle: 10
+    ports:
+      - "8089:8088"
+    depends_on:
+      - postgres_remote
+    networks:
+      - net_backend_remote
+      - net_frontend_local
+      - net_frontend_remote
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/api/v1/test"]
+      interval: 0m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+
+
+  frontend-local:
+    build:
+      context: .
+      dockerfile: frontend\Dockerfile
+    container_name: frontend_local
+    ports:
+      - "8084:3000"
+    depends_on:
+      - backend-local
+      - backend-remote
+    networks:
+      - net_frontend_local
+
+  frontend-remote:
+    build:
+      context: .
+      dockerfile: frontend\Dockerfile
+    container_name: frontend_remote
+    ports:
+      - "8085:3000"
+    depends_on:
+      - backend-local
+      - backend-remote
+    networks:
+      - net_frontend_remote

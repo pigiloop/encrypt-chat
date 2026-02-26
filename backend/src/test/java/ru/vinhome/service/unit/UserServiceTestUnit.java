@@ -1,24 +1,19 @@
 package ru.vinhome.service.unit;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
-import org.postgresql.util.PSQLException;
 import ru.vinhome.controller.dto.UserCreateRequest;
+import ru.vinhome.controller.dto.UserUpdateRequest;
 import ru.vinhome.model.User;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import ru.vinhome.service.UserServiceImpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class UserServiceTestUnit {
@@ -29,52 +24,36 @@ public class UserServiceTestUnit {
     public static void fillUsersArrayList() {
         users = new ArrayList<>();
 
-        users.add(new User(1L, "user1", "klepeshkin@mail.ru", "Konstantin",
+        users.add(new User(1, "user1", "klepeshkin@mail.ru", "Konstantin",
                 "Lepeshkin", "qwerty", 18));
 
-        users.add(new User(2L, "user2", "nuskov@mail.ru", "Nikita",
+        users.add(new User(2, "user2", "nuskov@mail.ru", "Nikita",
                 "Uskov", "qwerty", 25));
 
-        users.add(new User(3L, "user3", "cherepok@mail.ru", "Oleg",
+        users.add(new User(3, "user3", "cherepok@mail.ru", "Oleg",
                 "Cherpanov", "qwerty", 23));
     }
-/*
+
     @ParameterizedTest
     @CsvSource({
-            "4, kvin, ko@mail.ru, Konstantin, Vinogradov, passP123dssaaa, 18, 1, false",
-            "6, plotnik, alex@mail.ru, Alexey, Lobanov, passP123dssaaa, 22, 1, false"
+            "kvin, ko@mail.ru, Konstantin, Vinogradov, passP123dssaaa, 18, 1",
+            "plotnik, alex@mail.ru, Alexey, Lobanov, passP123dssaaa, 22, 1"
     })
-    public void save(String id, @NonNull String userName, String email, String fName,
-                     String lName, String password, int age, int result, Boolean isException)
+    public void save(String userName, String email, String fName,
+                     String lName, String password, int age, int result)
             throws SQLException, InterruptedException {
 
         UserCreateRequest userCreateRequest = new UserCreateRequest(
                 userName, email, fName, lName, password, age);
 
-        User user = User.builder()
-                .id(Long.valueOf(id))
-                .userName(userName)
-                .email(email)
-                .firstName(fName)
-                .lastName(lName)
-                .password(password)
-                .age(age)
-                .build();
-
         final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
         UserServiceImpl userService = new UserServiceImpl(userRepository);
 
-        Mockito.when(userRepository.save(user)).thenReturn(result);
+        Mockito.when(userService.save(userCreateRequest)).thenReturn(result);
 
-        if (isException) {
-            Exception exception = assertThrows(PSQLException.class, () -> userService.save(userCreateRequest));
-            Assertions.assertEquals("ERROR: duplicate key value violates unique constraint \"users_email_key\"\n"
-                    + "  Detail: Key (email)=(ko@mail.ru) already exists.", exception.getMessage());
-        } else {
-            Assertions.assertEquals(result, userService.save(userCreateRequest));
-        }
+        Assertions.assertEquals(result, userService.save(userCreateRequest));
     }
-*/
+
     @Test
     public void findAllTest() throws SQLException, InterruptedException {
 
@@ -93,37 +72,35 @@ public class UserServiceTestUnit {
 
     @ParameterizedTest
     @CsvSource({
-            "1, true",
-            "2, true",
-            "3, true"
+            "1",
+            "2",
+            "3"
     })
-    public void findByIdTestPositive(String id, String hasResult) throws SQLException, InterruptedException {
+    public void findByIdTestPositive(int id) throws SQLException, InterruptedException {
 
         final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
         UserServiceImpl userService = new UserServiceImpl(userRepository);
 
-        int index = Integer.parseInt(id);
-        Mockito.when(userRepository.findById(Long.parseLong(id))).thenReturn(users.get(index - 1));
+        Mockito.when(userRepository.findById(id)).thenReturn(users.get(id - 1));
 
-        User user = userService.findById(Long.parseLong(id));
+        User user = userService.findById(id);
 
-        Assertions.assertEquals(users.get(index - 1), user);
+        Assertions.assertEquals(users.get(id - 1), user);
     }
 
 
     @ParameterizedTest
     @CsvSource({
-            "16384, false"
+            "16384"
     })
-    public void findByIdTestNegative(String id, String hasResult) throws SQLException, InterruptedException {
+    public void findByIdTestNegative(int id) throws SQLException, InterruptedException {
 
         final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
         UserServiceImpl userService = new UserServiceImpl(userRepository);
 
-        int index = Integer.parseInt(id);
-        Mockito.when(userRepository.findById(Long.parseLong(id))).thenReturn(null);
+        Mockito.when(userRepository.findById(id)).thenReturn(null);
 
-        User user = userService.findById(Long.parseLong(id));
+        User user = userService.findById(id);
         Assertions.assertNull(user);
     }
 
@@ -151,7 +128,7 @@ public class UserServiceTestUnit {
     @CsvSource({
             "null, failUser"
     })
-    public void findByUsernameTestNegative(final String strIndex, final String username) throws SQLException, InterruptedException {
+    public void findByUsernameTestNegative(final String username) throws SQLException, InterruptedException {
 
         final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
         UserServiceImpl userService = new UserServiceImpl(userRepository);
@@ -178,18 +155,18 @@ public class UserServiceTestUnit {
     @CsvSource({
             "1", "2", "3"
     })
-    public void deleteTest(String id) throws SQLException, InterruptedException {
+    public void deleteTest(int id) throws SQLException, InterruptedException {
 
         final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
         UserServiceImpl userService = new UserServiceImpl(userRepository);
 
-        Mockito.when(userService.delete(Long.parseLong(id))).thenReturn(1);
+        Mockito.when(userService.delete(id)).thenReturn(1);
 
         Assertions.assertEquals(
-                1, userService.delete(Long.valueOf(id)));
+                1, userService.delete(id));
     }
 
-    /*
+
 
     @ParameterizedTest
     @CsvSource({
@@ -197,24 +174,21 @@ public class UserServiceTestUnit {
             "2, update",
             "3, update"
     })
-    public void updateTest(String id, String update) throws SQLException, InterruptedException {
-        final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
-        UserServiceImpl userService = new UserServiceImpl(userRepository);
+    public void updateTest(int id, String update) throws SQLException, InterruptedException {
 
-        User user = users.get(Integer.parseInt(id) - 1);
-        user.setFirstName(update);
-        user.setLastName(update);
+//        final var userRepository = Mockito.mock(JdbcUserRepositoryImpl.class);
 
-        Mockito.when(userService.update(Long.parseLong(id), user)).thenReturn(1);
-        Mockito.when(userService.findById(Long.parseLong(id))).thenReturn(user);
+//        UserServiceImpl userService = new UserServiceImpl(userRepository);
+        final var userService = Mockito.mock(UserServiceImpl.class);
 
-        Assertions.assertEquals(1, userService.update(Long.parseLong(id), user));
-        Assertions.assertEquals(
-                users.get(Integer.parseInt(id) - 1),
-                userService.findById(Long.parseLong(id))
-        );
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(update, update, 26);
+
+        Mockito.when(userService.update(id, userUpdateRequest)).thenReturn(1);
+
+        Assertions.assertEquals(1, userService.update(id, userUpdateRequest));
+
     }
-*/
+
 
 
 }

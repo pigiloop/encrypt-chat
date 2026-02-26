@@ -77,8 +77,9 @@ class AuthManager {
 
             console.log(`[AuthManager] Searching for user with username: "${username}"`);
             const user = users.find(u => {
-                console.log(`[AuthManager] Comparing: "${u.username}" === "${username}" ?`, u.username === username);
-                return u.username === username;
+                console.log(`Userdata: ${u}`);
+                console.log(`[AuthManager] Comparing: "${u.userName}" === "${username}" ?`, u.userName === username);
+                return u.userName === username;
             });
 
             if (!user) {
@@ -104,16 +105,29 @@ class AuthManager {
         console.log(`[AuthManager] ===== REGISTRATION ATTEMPT STARTED =====`);
 
         const usernameInput = document.getElementById('register-username');
-        const displayNameInput = document.getElementById('register-display-name');
+        const emailInput = document.getElementById('register-email');
+        const firstNameInput = document.getElementById('register-first-name');
+        const lastNameInput = document.getElementById('register-last-name');
+        const ageInput = document.getElementById('register-age');
 
         const username = usernameInput.value.trim();
-        const displayName = displayNameInput.value.trim();
+        const email = emailInput.value.trim();
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
+        const age = ageInput.value.trim();
 
+/*
+        const username = usernameInput.value.trim();
+        const displayName = displayNameInput.value.trim();
+*/
         console.log(`[AuthManager] Registration `);
         console.log(`[AuthManager] - username: "${username}" (length: ${username.length})`);
-        console.log(`[AuthManager] - displayName: "${displayName}" (length: ${displayName.length})`);
+        console.log(`[AuthManager] - email: "${email}" (length: ${email.length})`);
+        console.log(`[AuthManager] - firstName: "${firstName}" (length: ${firstName.length})`);
+        console.log(`[AuthManager] - lastName: "${lastName}" (length: ${lastName.length})`);
+        console.log(`[AuthManager] - age: "${age}" (length: ${age.length})`);
 
-        if (!username || !displayName) {
+        if (!username || !firstName) {
             console.warn(`[AuthManager] Missing required fields`);
             this.showError('Заполните все поля');
             return;
@@ -121,14 +135,15 @@ class AuthManager {
 
         try {
             console.log(`[AuthManager] Calling createUser API...`);
-            const createResult = await window.chatAPI.createUser(username, displayName);
+            const createResult = await window.chatAPI.createUser(
+                username, email, firstName, lastName, age);
             console.log(`[AuthManager] User creation result:`, createResult);
 
             console.log(`[AuthManager] Fetching user list to find created user...`);
             const users = await window.chatAPI.getAllUsers();
             console.log(`[AuthManager] Total users after creation: ${users.length}`);
 
-            const user = users.find(u => u.username === username);
+            const user = users.find(u => u.userName === username);
 
             if (user) {
                 console.log(`[AuthManager] Created user found:`, user);

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import ru.vinhome.model.User;
 
 public record UserCreateRequest(
 
@@ -31,7 +32,16 @@ public record UserCreateRequest(
 
         @Min(value = 18, message = "Age must be more or equals 18 year")
         @Max(value = 120, message = "Age must be less 120 year")
-        int age)
-{
+        int age) {
+
+        public static UserCreateRequest mapFromUser(final User user) {
+                return new UserCreateRequest(
+                        user.getUserName(),
+                        user.getEmail(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getPassword(),
+                        user.getAge());
+        }
 
 }

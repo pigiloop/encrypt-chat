@@ -18,7 +18,7 @@ class ChatManager {
         console.log(`[ChatManager] Setting up chat interface...`);
 
         // Отображаем имя пользователя
-        const displayName = this.currentUser.displayName || this.currentUser.username;
+        const displayName = this.currentUser.firstName & " " & this.currentUser.lastName || this.currentUser.userName;
         console.log(`[ChatManager] Display name: ${displayName}`);
         document.getElementById('current-user-name').textContent = displayName;
 
@@ -95,13 +95,13 @@ class ChatManager {
             }
 
             // Первая буква имени для аватара
-            const initial = (user.displayName || user.username).charAt(0).toUpperCase();
+            const initial = (user.firstName || user.userName).charAt(0).toUpperCase();
 
             userItem.innerHTML = `
                 <div class="user-avatar">${initial}</div>
                 <div class="user-details">
-                    <div class="user-username">${user.username}</div>
-                    ${user.displayName ? `<div class="user-display-name">${user.displayName}</div>` : ''}
+                    <div class="user-username">${user.userName}</div>
+                    ${user.firstName ? `<div class="user-display-name">${user.firstName} ${user.lastName}</div>` : ''}
                 </div>
             `;
 
@@ -127,7 +127,7 @@ class ChatManager {
 
         // Обновляем заголовок чата
         const recipientDiv = document.getElementById('chat-recipient');
-        recipientDiv.innerHTML = `Чат с: <strong>${user.displayName || user.username}</strong>`;
+        recipientDiv.innerHTML = `Чат с: <strong>${user.userName}</strong>`;
 
         // Включаем форму отправки
         const input = document.getElementById('message-input');
@@ -188,8 +188,8 @@ class ChatManager {
 
         // Фильтруем сообщения: только между мной и выбранным получателем
         const conversationMessages = this.messages.filter(msg =>
-            (msg.from === this.currentUser.id && msg.to === this.selectedRecipient.id) ||
-            (msg.from === this.selectedRecipient.id && msg.to === this.currentUser.id)
+            (msg.senderId === this.currentUser.id && msg.recipientId === this.selectedRecipient.id) ||
+            (msg.senderId === this.selectedRecipient.id && msg.recipientId === this.currentUser.id)
         );
 
         console.log(`[ChatManager] Found ${conversationMessages.length} messages in conversation`);
@@ -212,15 +212,15 @@ class ChatManager {
                 messageDiv.classList.add('incoming');
             }
 
-            const date = new Date(message.date);
+            const date = new Date(message.createdAt);
             const timeString = date.toLocaleTimeString('ru-RU', {
                 hour: '2-digit',
                 minute: '2-digit'
             });
 
             messageDiv.innerHTML = `
-                <div class="message-header">${isOutgoing ? 'Вы' : this.selectedRecipient.displayName || this.selectedRecipient.username}</div>
-                <div class="message-content">${this.escapeHtml(message.data)}</div>
+                <div class="message-header">${isOutgoing ? 'Вы' : this.selectedRecipient.firstName || this.selectedRecipient.userName}</div>
+                <div class="message-content">${this.escapeHtml(message.message)}</div>
                 <div class="message-time">${timeString}</div>
             `;
 

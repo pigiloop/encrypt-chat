@@ -9,17 +9,25 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+
 public class PostgresTestContainer {
 
-    private static final String DB_USERNAME = PropertiesUtil.get(PropertiesUtil.DB_USERNAME_KEY);
-    private static final String DB_PASSWORD = PropertiesUtil.get(PropertiesUtil.DB_PASSWORD_KEY);
-    private static final int DB_PORT = PropertiesUtil.getPropertyToInt(PropertiesUtil.DB_PORT_KEY);
-    private static final String DB_NAME = PropertiesUtil.get(PropertiesUtil.DB_NAME_KEY);
-    private static final String IMAGE_VERSION = PropertiesUtil.getOrElse(
+
+    private static final String DB_USERNAME = PropertiesUtil
+            .getPropertiesFromSystemEnvOrProperties(PropertiesUtil.DB_USERNAME_KEY);
+
+    private static final String DB_PASSWORD = PropertiesUtil
+            .getPropertiesFromSystemEnvOrProperties(PropertiesUtil.DB_PASSWORD_KEY);
+
+    private static final int DB_PORT = PropertiesUtil.getPropertiesFromSystemEnvOrPropertiesToInt(PropertiesUtil.DB_PORT_KEY);
+
+    private static final String DB_NAME = PropertiesUtil
+            .getPropertiesFromSystemEnvOrProperties(PropertiesUtil.DB_NAME_KEY);
+
+    private static final String IMAGE_VERSION = PropertiesUtil.getPropertiesFromSystemEnvOrProperties(
             PropertiesUtil.IMAGE_VERSION_KEY_POSTGRESQL,
             "18.1-alpine3.22");
 
@@ -36,7 +44,10 @@ public class PostgresTestContainer {
                     .withExposedPorts(DB_PORT)
                     .withDatabaseName(DB_NAME)
                     .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
-                            new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(DB_PORT), new ExposedPort(DB_PORT)))));
+                            new HostConfig().
+                                    withPortBindings(
+                                    new PortBinding(Ports.Binding.bindPort(DB_PORT), new ExposedPort(DB_PORT)))));
+
         }
         return postgreSQLContainer;
     }
@@ -66,15 +77,17 @@ public class PostgresTestContainer {
     }
 
     public static void initSQL(Path pathToSqlInit) throws InterruptedException {
-        Connection connection = ConnectionUtil.getConnection();
-        System.out.println(ConnectionUtil.CONNECTION_POOL);
-        try (PreparedStatement preparedStatement = connection.prepareStatement(Files.readString(pathToSqlInit));) {
-            preparedStatement.execute();
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            ConnectionUtil.returnConnection(connection);
-        }
 
+        try (
+                var connection = ConnectionUtil.getConnection();
+        ) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(Files.readString(pathToSqlInit));) {
+                preparedStatement.execute();
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
