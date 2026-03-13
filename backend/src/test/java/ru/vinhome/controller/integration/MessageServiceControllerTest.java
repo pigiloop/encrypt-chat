@@ -5,7 +5,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.vinhome.WrapperJettyServer;
 import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 import ru.vinhome.repository.JdbcUserRepositoryImpl;
 import ru.vinhome.util.ConnectionUtil;
@@ -28,11 +27,8 @@ public class MessageServiceControllerTest {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
-    private static final WrapperJettyServer WRAPPER_JETTY_SERVER = new WrapperJettyServer();
-
     @BeforeAll
     static void startJettyServer() throws Exception {
-        WRAPPER_JETTY_SERVER.start();
         PostgresTestContainer.start();
         ConnectionUtil.reloadPool();
     }
@@ -40,7 +36,6 @@ public class MessageServiceControllerTest {
     @AfterAll
     static void stopJettyServer() throws Exception {
         PostgresTestContainer.stop();
-        WRAPPER_JETTY_SERVER.close();
     }
 
     @BeforeEach

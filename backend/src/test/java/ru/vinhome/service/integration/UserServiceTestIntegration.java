@@ -117,7 +117,7 @@ public class UserServiceTestIntegration {
         JdbcUserRepositoryImpl userRepository = new JdbcUserRepositoryImpl();
         UserServiceImpl userService = new UserServiceImpl(userRepository);
 
-        User user = userService.findById(id);
+        User user = userService.findById(id).get();
 
 
         if (hasResult.equals("true")) {

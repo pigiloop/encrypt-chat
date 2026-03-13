@@ -1,5 +1,7 @@
 package ru.vinhome.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.vinhome.controller.dto.UserCreateRequest;
 import ru.vinhome.controller.dto.UserUpdateRequest;
 import ru.vinhome.model.User;
@@ -9,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     private final JdbcUserRepositoryImpl jdbcUserRepository;
@@ -20,6 +23,7 @@ public class UserServiceImpl implements UserService {
      * @param userRepository параметр типа JdbcUserRepositoryImpl
      * @see JdbcUserRepositoryImpl
      */
+    @Autowired
     public UserServiceImpl(JdbcUserRepositoryImpl userRepository) {
         this.jdbcUserRepository = userRepository;
     }

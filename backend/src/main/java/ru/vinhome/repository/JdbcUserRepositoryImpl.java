@@ -1,5 +1,6 @@
 package ru.vinhome.repository;
 
+import org.springframework.stereotype.Component;
 import ru.vinhome.model.User;
 import ru.vinhome.util.ConnectionUtil;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
  * @see UserRepository
  * @see User
  */
+@Component
 public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, UserRepository {
 
     private static final String SELECT_ALL_SQL = """

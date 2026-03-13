@@ -83,7 +83,7 @@ public class UserServiceTestUnit {
 
         Mockito.when(userRepository.findById(id)).thenReturn(users.get(id - 1));
 
-        User user = userService.findById(id);
+        User user = userService.findById(id).get();
 
         Assertions.assertEquals(users.get(id - 1), user);
     }
@@ -100,7 +100,7 @@ public class UserServiceTestUnit {
 
         Mockito.when(userRepository.findById(id)).thenReturn(null);
 
-        User user = userService.findById(id);
+        User user = userService.findById(id).get();
         Assertions.assertNull(user);
     }
 

@@ -101,9 +101,9 @@ public class MessageServiceTestUnit {
         final var messageRepository = Mockito.mock(JdbcMessageRepositoryImpl.class);
         MessageServiceImpl messageService = new MessageServiceImpl(messageRepository);
 
-        Mockito.when(messageService.findById(id)).thenReturn(messages.get(id - 1));
+        Mockito.when(messageService.findById(id).get()).thenReturn(messages.get(id - 1));
 
-        Message message = messageService.findById(id);
+        Message message = messageService.findById(id).get();
 
         Assertions.assertEquals(messages.get(id - 1), message);
     }
@@ -119,7 +119,7 @@ public class MessageServiceTestUnit {
 
         Mockito.when(messageService.findById(id)).thenReturn(null);
 
-        Message message = messageService.findById(id);
+        Message message = messageService.findById(id).get();
         Assertions.assertNull(message);
     }
 

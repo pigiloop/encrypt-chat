@@ -1,35 +1,28 @@
 package ru.vinhome.controller;
 
-import jakarta.inject.Inject;
-import jakarta.validation.Valid;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.websocket.server.PathParam;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.vinhome.controller.dto.UserCreateRequest;
-import ru.vinhome.controller.dto.UserUpdateRequest;
+import ru.vinhome.model.User;
 import ru.vinhome.service.UserService;
 
-
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Класс контроллер пользователя
  */
-@Path("/v1/users")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/user")
 public class UserRestController {
 
     private final UserService userService;
 
-    @Inject
+    @Autowired
     public UserRestController(final UserService userService) {
         this.userService = userService;
     }
@@ -39,16 +32,13 @@ public class UserRestController {
      *
      * @return возвращает http ответ с данными о пользователях в формате JSON
      */
-    @GET
-    public Response findAll() {
+    @GetMapping
+    public ResponseEntity<List<User>> findAll() {
         try {
-            return Response.status(Response.Status.OK)
-                    .entity(userService.findAll())
-                    .build();
+            return ResponseEntity.ok(userService.findAll());
         } catch (SQLException e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -58,18 +48,16 @@ public class UserRestController {
      * @param id идентификатор пользователя
      * @return возвращает объект класса User
      */
-    @GET
-    @Path("/{id}")
-    public Response findById(@PathParam("id") final int id) {
-
+    @GetMapping("/{id}")
+    public ResponseEntity<User> findById(@PathVariable("id") final int id) {
         try {
-            return Response.ok()
-                    .entity(userService.findById(id))
-                    .build();
+            final var maybeUser = userService.findById(id);
+
+            return maybeUser.isPresent()
+                    ? ResponseEntity.ok(maybeUser.get())
+                    : ResponseEntity.notFound().build();
         } catch (SQLException e) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(e.getMessage())
-                    .build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -79,19 +67,12 @@ public class UserRestController {
      * @param userName имя пользователя
      * @return возвращает объект класса User
      */
-    @GET
-    @Path("/username={username}")
-    public Response findByUsername(@PathParam("username") final String userName) {
-
+    @GetMapping("/{username}")
+    public ResponseEntity<User> findByUsername(@PathVariable("username") final String userName) {
         try {
-            return Response.status(Response.Status.OK)
-                    .entity(userService.findByUsername(userName))
-                    .build();
+            return ResponseEntity.ok(userService.findByUsername(userName));
         } catch (SQLException e) {
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .entity("e.getMessage()")
-                    .build();
+            return ResponseEntity.internalServerError().build();
         }
 
     }
@@ -102,61 +83,56 @@ public class UserRestController {
      * @param userCreateRequest пользователь, который должен быть сохранён в базе данных
      * @return возвращает статус сохранился ли пользователь или нет
      */
-    @POST
-    public Response save(@Valid final UserCreateRequest userCreateRequest) {
-
+    @PostMapping
+    public ResponseEntity<UserCreateRequest> save(@RequestBody final UserCreateRequest userCreateRequest) {
         try {
             userService.save(userCreateRequest);
-            return Response.status(Response.Status.CREATED)
-                    .entity(userCreateRequest)
-                    .build();
+            return ResponseEntity.status(201).body(userCreateRequest);
         } catch (SQLException e) {
-            return Response.status(Response.Status.NOT_MODIFIED)
-                    .entity(e.getMessage())
-                    .build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-    /**
-     * Сохраняет запись пользователя
-     *
-     * @param userUpdateRequest пользователь, который должен быть сохранён в базе данных
-     * @return возвращает статус сохранился ли пользователь или нет
-     */
-    @PUT
-    @Path("/{id}")
-    public Response update(@PathParam("id") final int id, @Valid final UserUpdateRequest userUpdateRequest) {
-
-        try {
-            userService.update(id, userUpdateRequest);
-            return Response.status(Response.Status.CREATED)
-                    .entity(userUpdateRequest)
-                    .build();
-        } catch (SQLException e) {
-            return Response.status((Response.Status.NOT_MODIFIED))
-                    .entity(e.getMessage())
-                    .build();
-        }
-    }
-
-    /**
-     * Удаляет запись пользователя по его идентификатору
-     *
-     * @param id идентификатор пользователя
-     * @return возвращает статус удаления пользователя
-     */
-    @DELETE
-    @Path("/{id}")
-    public Response delete(@PathParam("id") final int id) {
-        try {
-            return Response.status(Response.Status.OK)
-                    .entity(userService.delete(id))
-                    .build();
-        } catch (SQLException e) {
-            return Response
-                    .status(Response.Status.NOT_MODIFIED)
-                    .entity("e.getMessage()")
-                    .build();
-        }
-    }
+//    /**
+//     * Сохраняет запись пользователя
+//     *
+//     * @param userUpdateRequest пользователь, который должен быть сохранён в базе данных
+//     * @return возвращает статус сохранился ли пользователь или нет
+//     */
+//    @PUT
+//    @Path("/{id}")
+//    public Response update(@PathParam("id") final int id, @Valid final UserUpdateRequest userUpdateRequest) {
+//
+//        try {
+//            userService.update(id, userUpdateRequest);
+//            return Response.status(Response.Status.CREATED)
+//                    .entity(userUpdateRequest)
+//                    .build();
+//        } catch (SQLException e) {
+//            return Response.status((Response.Status.NOT_MODIFIED))
+//                    .entity(e.getMessage())
+//                    .build();
+//        }
+//    }
+//
+//    /**
+//     * Удаляет запись пользователя по его идентификатору
+//     *
+//     * @param id идентификатор пользователя
+//     * @return возвращает статус удаления пользователя
+//     */
+//    @DELETE
+//    @Path("/{id}")
+//    public Response delete(@PathParam("id") final int id) {
+//        try {
+//            return Response.status(Response.Status.OK)
+//                    .entity(userService.delete(id))
+//                    .build();
+//        } catch (SQLException e) {
+//            return Response
+//                    .status(Response.Status.NOT_MODIFIED)
+//                    .entity("e.getMessage()")
+//                    .build();
+//        }
+//    }
 }

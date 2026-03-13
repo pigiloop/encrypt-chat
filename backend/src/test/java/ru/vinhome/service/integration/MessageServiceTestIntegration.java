@@ -102,7 +102,7 @@ public class MessageServiceTestIntegration {
     public void findByIdTest(int id, String isTrue) throws SQLException, InterruptedException {
         MessageServiceImpl messageService = new MessageServiceImpl();
 
-        Message message = messageService.findById(id);
+        Message message = messageService.findById(id).get();
 
         if (isTrue.equals("true")) {
             Assertions.assertEquals(messages.get(id - 1), message);
