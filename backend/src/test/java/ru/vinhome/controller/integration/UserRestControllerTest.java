@@ -53,14 +53,14 @@ public class UserRestControllerTest {
         JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
         try {
             jdbcMessageRepository.dropTable();
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
         try {
             jdbcUserRepository.dropTable();
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -139,7 +139,6 @@ public class UserRestControllerTest {
         HttpResponse<String> httpResponse = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println(httpResponse.body());
     }
-
 
 
 }

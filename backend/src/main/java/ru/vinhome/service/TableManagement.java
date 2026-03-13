@@ -14,15 +14,13 @@ public interface TableManagement {
      * Метод создаёт таблицу.
      * *
      * @exception SQLException выкидывает исключения в случае если база данных недоступна
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
      */
-    void createTable() throws SQLException, InterruptedException;
+    void createTable() throws SQLException;
 
     /**
      * Метод удаляет таблицу.
      * @exception SQLException выкидывает исключения в случае если база данных недоступна
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
      * *
      */
-    void dropTable() throws SQLException, InterruptedException;
+    void dropTable() throws SQLException;
 }

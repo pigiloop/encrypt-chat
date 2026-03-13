@@ -40,6 +40,10 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
             WHERE username = ?;
             """;
 
+    public static final String EXISTS_USER_BY_ID = """
+            SELECT EXISTS (select * from public.users where id=?);
+            """;
+
     private static final String INSERT_SQL = """
             INSERT INTO public.users(username, email, first_name, last_name, password, age)
             VALUES(?, ?, ?, ?, ?, ?);
@@ -76,13 +80,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
      * Метод выводит все записи таблицы users.
      *
      * @return возвращает список объектов типа User
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public ArrayList<User> findAll() throws InterruptedException, SQLException {
+    public ArrayList<User> findAll() throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -108,16 +111,15 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
     /**
      * Метод выводит запись таблицы users по её уникальному идентификатору используя существующее соединение connection типа Connection.
      *
-     * @param id         идентификатор типа Long
+     * @param id идентификатор типа Long
      * @return возвращает объект типа User
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * @see Connection
      * *
      */
     @Override
-    public User findById(Integer id) throws SQLException, InterruptedException {
+    public User findById(Integer id) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -149,13 +151,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
      *
      * @param userName имя пользователя типа String
      * @return возвращает объект типа User
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public User findByUsername(String userName) throws SQLException, InterruptedException {
+    public User findByUsername(String userName) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -187,12 +188,11 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
      *
      * @param email электронная почта пользователя типа String
      * @return возвращает true или false в зависимости есть ли указанная электронная почта в таблице или нет.
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public boolean emailExist(String email) throws SQLException, InterruptedException {
+    public boolean emailExist(String email) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -212,13 +212,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
      *
      * @param obj экземпляр класса User
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int save(final User obj) throws SQLException, InterruptedException {
+    public int save(final User obj) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -243,13 +242,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
      * @param id  идентификатор типа Long
      * @param obj экземпляр класса User
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int update(Integer id, User obj) throws SQLException, InterruptedException {
+    public int update(Integer id, User obj) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -270,13 +268,12 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
      *
      * @param id идентификатор типа Long
      * @return возвращает количество удалённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int delete(Integer id) throws SQLException, InterruptedException {
+    public int delete(Integer id) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -294,11 +291,10 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
     /**
      * Метод создаёт таблицу users
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
-    public void createTable() throws SQLException, InterruptedException {
+    public void createTable() throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -311,11 +307,10 @@ public class JdbcUserRepositoryImpl implements BaseRepository<User, Integer>, Us
     /**
      * Метод удаляет таблицу users
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
-    public void dropTable() throws SQLException, InterruptedException {
+    public void dropTable() throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();

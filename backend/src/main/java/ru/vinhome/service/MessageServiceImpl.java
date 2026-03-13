@@ -8,6 +8,7 @@ import ru.vinhome.repository.JdbcMessageRepositoryImpl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 
 /**
@@ -47,28 +48,27 @@ public class MessageServiceImpl implements MessageService {
      * Метод выводит все записи таблицы message.
      *
      * @return возвращает список объектов типа Message
-     * @throws InterruptedException возникает в случае ошибки получения подключения
+
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *
      */
     @Override
-    public ArrayList<Message> findAll() throws SQLException, InterruptedException {
+    public ArrayList<Message> findAll() throws SQLException {
         return jdbcMessageRepository.findAll();
     }
 
     /**
-     * Метод выводит запись таблицы message по её уникальному идентификатору.     *
+     * Метод выводит запись таблицы message по её уникальному идентификатору.
      * @param id идентификатор типа Long
      * @return возвращает объект типа Message
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see Message
      * @see Connection
      * *
      */
     @Override
-    public Message findById(Integer id) throws SQLException, InterruptedException {
-        return jdbcMessageRepository.findById(id);
+    public Optional<Message> findById(Integer id) throws SQLException {
+        return Optional.ofNullable(jdbcMessageRepository.findById(id));
     }
 
     /**
@@ -76,13 +76,12 @@ public class MessageServiceImpl implements MessageService {
      *
      * @param obj объект типа Message
      * @return возвращает количество изменённых записей в таблице message
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see Message
      *
      */
     @Override
-    public int save(MessageCreateRequest obj) throws SQLException, InterruptedException {
+    public int save(MessageCreateRequest obj) throws SQLException {
 
         Message message = Message.builder()
                 .senderId(obj.sender())
@@ -99,13 +98,12 @@ public class MessageServiceImpl implements MessageService {
      * @param id  идентификатор типа Long
      * @param obj объект типа Message
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see Message
      * *
      */
     @Override
-    public int update(Integer id, MessageUpdateRequest obj) throws SQLException, InterruptedException {
+    public int update(Integer id, MessageUpdateRequest obj) throws SQLException {
 
         Message message = jdbcMessageRepository.findById(id);
 
@@ -119,36 +117,33 @@ public class MessageServiceImpl implements MessageService {
      *
      * @param id идентификатор типа Long
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public int delete(Integer id) throws SQLException, InterruptedException {
+    public int delete(Integer id) throws SQLException {
         return jdbcMessageRepository.delete(id);
     }
 
     /**
      * Метод создаёт таблицу message.
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public void createTable() throws SQLException, InterruptedException {
+    public void createTable() throws SQLException {
         jdbcMessageRepository.createTable();
     }
 
     /**
      * Метод удаляет таблицу message.
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public void dropTable() throws SQLException, InterruptedException {
+    public void dropTable() throws SQLException {
         jdbcMessageRepository.dropTable();
     }
 }

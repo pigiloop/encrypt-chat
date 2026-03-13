@@ -16,9 +16,8 @@ public interface BaseRepository<T, I> {
      *
      * @return возвращает список объектов типа T
      * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
      */
-    List<T> findAll() throws SQLException, InterruptedException;
+    List<T> findAll() throws SQLException;
 
     /**
      * Метод выводит запись таблицы по её уникальному идентификатору.
@@ -26,10 +25,9 @@ public interface BaseRepository<T, I> {
      * @param id идентификатор типа I
      * @return возвращает объект типа T
      * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
      *                              *
      */
-    T findById(I id) throws SQLException, InterruptedException;
+    T findById(I id) throws SQLException;
 
     /**
      * Метод сохраняет запись в таблице.
@@ -37,10 +35,9 @@ public interface BaseRepository<T, I> {
      * @param obj объект типа T
      * @return возвращает количество изменённых записей
      * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
      *                              *
      */
-    int save(T obj) throws SQLException, InterruptedException;
+    int save(T obj) throws SQLException;
 
     /**
      * Метод изменяет запись в таблице.
@@ -49,10 +46,9 @@ public interface BaseRepository<T, I> {
      * @param obj объект типа T
      * @return возвращает количество изменённых записей
      * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
      *                              *
      */
-    int update(I id, T obj) throws SQLException, InterruptedException;
+    int update(I id, T obj) throws SQLException;
 
     /**
      * Метод удаляет запись из таблицы.
@@ -60,26 +56,23 @@ public interface BaseRepository<T, I> {
      * @param id идентификатор типа I
      * @return возвращает количество изменённых записей
      * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
      *                              *
      */
-    int delete(I id) throws SQLException, InterruptedException;
+    int delete(I id) throws SQLException;
 
     /**
      * Метод создаёт таблицу.
      *
      * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
      *                              *
      */
-    void createTable() throws SQLException, InterruptedException;
+    void createTable() throws SQLException;
 
     /**
      * Метод удаляет таблицу.
      *
      * @throws SQLException         выкидывает исключения в случае если база данных недоступна
-     * @throws InterruptedException выкидывает исключение если все ресурсы заняты
      *                              *
      */
-    void dropTable() throws SQLException, InterruptedException;
+    void dropTable() throws SQLException;
 }

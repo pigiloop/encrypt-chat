@@ -45,10 +45,11 @@ public class UserRestController {
             return Response.status(Response.Status.OK)
                     .entity(userService.findAll())
                     .build();
-        } catch (SQLException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build();
         }
-
     }
 
     /**
@@ -60,18 +61,14 @@ public class UserRestController {
     @GET
     @Path("/{id}")
     public Response findById(@PathParam("id") final int id) {
+
         try {
-            try {
-                return Response.ok()
-                        .entity(userService.findById(id))
-                        .build();
-            } catch (SQLException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (NullPointerException e) {
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .entity("e.getMessage()")
+            return Response.ok()
+                    .entity(userService.findById(id))
+                    .build();
+        } catch (SQLException e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
                     .build();
         }
     }
@@ -85,23 +82,18 @@ public class UserRestController {
     @GET
     @Path("/username={username}")
     public Response findByUsername(@PathParam("username") final String userName) {
+
         try {
-            try {
-                return Response.status(Response.Status.OK)
-                        .entity(userService.findByUsername(userName))
-                        .build();
-            } catch (SQLException | InterruptedException e) {
-                return Response
-                        .status(Response.Status.BAD_REQUEST)
-                        .entity("e.getMessage()")
-                        .build();
-            }
-        } catch (NullPointerException e) {
+            return Response.status(Response.Status.OK)
+                    .entity(userService.findByUsername(userName))
+                    .build();
+        } catch (SQLException e) {
             return Response
                     .status(Response.Status.NOT_FOUND)
                     .entity("e.getMessage()")
                     .build();
         }
+
     }
 
     /**
@@ -118,8 +110,8 @@ public class UserRestController {
             return Response.status(Response.Status.CREATED)
                     .entity(userCreateRequest)
                     .build();
-        } catch (SQLException | InterruptedException e) {
-            return Response.status(Response.Status.BAD_REQUEST)
+        } catch (SQLException e) {
+            return Response.status(Response.Status.NOT_MODIFIED)
                     .entity(e.getMessage())
                     .build();
         }
@@ -140,8 +132,8 @@ public class UserRestController {
             return Response.status(Response.Status.CREATED)
                     .entity(userUpdateRequest)
                     .build();
-        } catch (SQLException | InterruptedException e) {
-            return Response.status((Response.Status.BAD_REQUEST))
+        } catch (SQLException e) {
+            return Response.status((Response.Status.NOT_MODIFIED))
                     .entity(e.getMessage())
                     .build();
         }
@@ -160,9 +152,9 @@ public class UserRestController {
             return Response.status(Response.Status.OK)
                     .entity(userService.delete(id))
                     .build();
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             return Response
-                    .status(Response.Status.NOT_FOUND)
+                    .status(Response.Status.NOT_MODIFIED)
                     .entity("e.getMessage()")
                     .build();
         }

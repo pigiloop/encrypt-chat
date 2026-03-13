@@ -53,14 +53,14 @@ public class MessageServiceControllerTest {
         JdbcMessageRepositoryImpl jdbcMessageRepository = new JdbcMessageRepositoryImpl();
         try {
             jdbcMessageRepository.dropTable();
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         JdbcUserRepositoryImpl jdbcUserRepository = new JdbcUserRepositoryImpl();
         try {
             jdbcUserRepository.dropTable();
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -104,7 +104,7 @@ public class MessageServiceControllerTest {
     }
 
     @Test
-    void save() throws IOException, InterruptedException {
+    void savePositive() throws IOException, InterruptedException {
 
         String message = """
                   {
@@ -123,5 +123,27 @@ public class MessageServiceControllerTest {
         HttpResponse<String> httpResponse = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println(httpResponse.body());
     }
+
+    @Test
+    void saveNegative() throws IOException, InterruptedException {
+
+        String message = """
+                  {
+                    "senderId": 1024,
+                    "recipientId": 1,
+                    "message": "Привет, сегодня был чудесный вечер. Он был незабываемый"
+                  }
+                """;
+
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/v1/users/"))
+                .POST(HttpRequest.BodyPublishers.ofString(message))
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .build();
+
+        HttpResponse<String> httpResponse = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(httpResponse.body());
+    }
+
 
 }

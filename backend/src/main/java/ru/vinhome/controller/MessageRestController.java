@@ -13,9 +13,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ru.vinhome.controller.dto.MessageCreateRequest;
 import ru.vinhome.controller.dto.MessageUpdateRequest;
+import ru.vinhome.model.Message;
+import ru.vinhome.repository.UserRepository;
 import ru.vinhome.service.MessageService;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 @Path("/v1/messages")
 @Produces(MediaType.APPLICATION_JSON)
@@ -40,8 +43,8 @@ public class MessageRestController {
             return Response.status(Response.Status.OK)
                     .entity(messageService.findAll())
                     .build();
-        } catch (SQLException | InterruptedException e) {
-            return Response.status(Response.Status.BAD_GATEWAY)
+        } catch (SQLException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .build();
         }
@@ -57,13 +60,18 @@ public class MessageRestController {
     @Path("/{id}")
     public Response findById(@PathParam("id") final Integer id) {
         try {
-            return Response.status(Response.Status.OK)
-                    .entity(messageService.findById(id))
-                    .build();
-        } catch (SQLException | InterruptedException e) {
-            return Response.status(Response.Status.BAD_GATEWAY)
-                    .entity(e.getMessage())
-                    .build();
+
+            Optional<Message> mayBeMessage = messageService.findById(id);
+
+            return mayBeMessage.isPresent()
+                    ? Response.status(Response.Status.OK)
+                                            .entity(mayBeMessage.get())
+                                            .build()
+                    : Response.status(Response.Status.NOT_FOUND)
+                                            .entity("Сообщение не найдено")
+                                            .build();
+        } catch (SQLException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
@@ -75,13 +83,21 @@ public class MessageRestController {
      */
     @POST
     public Response save(MessageCreateRequest message) {
+
         try {
-            messageService.save(message);
-            return Response.status(Response.Status.CREATED)
-                    .entity(message)
-                    .build();
-        } catch (SQLException | InterruptedException e) {
-            return Response.status(Response.Status.BAD_GATEWAY)
+            if (UserRepository.userExistByID(message.recipient()) && UserRepository.userExistByID(message.sender())) {
+                messageService.save(message);
+                return Response.status(Response.Status.OK)
+                        .entity(message)
+                        .build();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Получателя или отправителя не существует, необходимо исправить сообщение")
+                        .build();
+            }
+
+        } catch (SQLException e) {
+            return Response.status(Response.Status.NOT_MODIFIED)
                     .entity(e.getMessage())
                     .build();
         }
@@ -90,7 +106,7 @@ public class MessageRestController {
     /**
      * Изменяет запись сообщения в базе данных
      *
-     * @param id    идентификатор сообщения которое должно быть изменено в базе данных
+     * @param id      идентификатор сообщения которое должно быть изменено в базе данных
      * @param message тело сообщения изменяемого сообщения
      * @return возвращает статус сохранился ли пользователь или нет
      */
@@ -103,8 +119,8 @@ public class MessageRestController {
             return Response.status(Response.Status.CREATED)
                     .entity(message)
                     .build();
-        } catch (SQLException | InterruptedException e) {
-            return Response.status((Response.Status.BAD_REQUEST))
+        } catch (SQLException e) {
+            return Response.status((Response.Status.NOT_MODIFIED))
                     .entity(e.getMessage())
                     .build();
         }
@@ -123,12 +139,11 @@ public class MessageRestController {
             return Response.status(Response.Status.OK)
                     .entity(messageService.delete(id))
                     .build();
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             return Response
-                    .status(Response.Status.NOT_FOUND)
+                    .status(Response.Status.NOT_MODIFIED)
                     .entity("e.getMessage()")
                     .build();
         }
     }
-
 }

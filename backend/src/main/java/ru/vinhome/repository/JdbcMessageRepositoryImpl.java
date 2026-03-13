@@ -61,12 +61,11 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Intege
      * Метод выводит все записи таблицы message.
      *
      * @return возвращает список объектов типа Message
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public ArrayList<Message> findAll() throws SQLException, InterruptedException {
+    public ArrayList<Message> findAll() throws SQLException {
         final var messages = new ArrayList<Message>();
 
         try (
@@ -93,13 +92,12 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Intege
      *
      * @param id идентификатор типа Long
      * @return возвращает объект типа Message
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see Message
      * *
      */
     @Override
-    public Message findById(Integer id) throws SQLException, InterruptedException {
+    public Message findById(Integer id) throws SQLException {
 
 
         try (
@@ -132,13 +130,12 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Intege
      *
      * @param obj объект типа Message
      * @return возвращает количество изменённых записей в таблице message
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see Message
      *
      */
     @Override
-    public int save(Message obj) throws SQLException, InterruptedException {
+    public int save(Message obj) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -160,13 +157,12 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Intege
      * @param id  идентификатор типа Long
      * @param obj объект типа Message
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see Message
      * *
      */
     @Override
-    public int update(Integer id, Message obj) throws SQLException, InterruptedException {
+    public int update(Integer id, Message obj) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -188,12 +184,11 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Intege
      *
      * @param id идентификатор типа Long
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public int delete(Integer id) throws SQLException, InterruptedException {
+    public int delete(Integer id) throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -209,12 +204,11 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Intege
     /**
      * Метод создаёт таблицу message.
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public void createTable() throws SQLException, InterruptedException {
+    public void createTable() throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();
@@ -227,12 +221,11 @@ public class JdbcMessageRepositoryImpl implements BaseRepository<Message, Intege
     /**
      * Метод удаляет таблицу message.
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public void dropTable() throws SQLException, InterruptedException {
+    public void dropTable() throws SQLException {
 
         try (
                 var connection = ConnectionUtil.getConnection();

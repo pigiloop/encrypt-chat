@@ -7,6 +7,7 @@ import ru.vinhome.repository.JdbcUserRepositoryImpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
 
@@ -27,12 +28,11 @@ public class UserServiceImpl implements UserService {
      * Метод выводит все записи таблицы users.
      *
      * @return возвращает список объектов типа User
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *
      */
     @Override
-    public ArrayList<User> findAll() throws SQLException, InterruptedException {
+    public ArrayList<User> findAll() throws SQLException {
         return jdbcUserRepository.findAll();
     }
 
@@ -41,14 +41,13 @@ public class UserServiceImpl implements UserService {
      *
      * @param id идентификатор типа Long
      * @return возвращает объект типа User
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public User findById(Integer id) throws SQLException, InterruptedException {
-        return jdbcUserRepository.findById(id);
+    public Optional<User> findById(Integer id) throws SQLException {
+        return Optional.ofNullable(jdbcUserRepository.findById(id));
     }
 
     /**
@@ -56,13 +55,12 @@ public class UserServiceImpl implements UserService {
      *
      * @param userName имя пользователя типа String
      * @return возвращает объект типа User
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public User findByUsername(String userName) throws SQLException, InterruptedException {
+    public User findByUsername(String userName) throws SQLException {
         return jdbcUserRepository.findByUsername(userName);
     }
 
@@ -71,13 +69,12 @@ public class UserServiceImpl implements UserService {
      *
      * @param obj экземпляр класса User
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int save(UserCreateRequest obj) throws SQLException, InterruptedException {
+    public int save(UserCreateRequest obj) throws SQLException {
         User user = User.builder()
                 .userName(obj.userName())
                 .email(obj.email())
@@ -95,13 +92,12 @@ public class UserServiceImpl implements UserService {
      * @param id  идентификатор типа Long
      * @param obj экземпляр класса User
      * @return возвращает количество изменённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int update(Integer id, UserUpdateRequest obj) throws SQLException, InterruptedException {
+    public int update(Integer id, UserUpdateRequest obj) throws SQLException {
 
         User user = jdbcUserRepository.findById(id);
 
@@ -117,37 +113,34 @@ public class UserServiceImpl implements UserService {
      *
      * @param id идентификатор типа Long
      * @return возвращает количество удалённых записей
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      * @see User
      * *
      */
     @Override
-    public int delete(Integer id) throws SQLException, InterruptedException {
+    public int delete(Integer id) throws SQLException {
         return jdbcUserRepository.delete(id);
     }
 
     /**
      * Метод создаёт таблицу users
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public void createTable() throws SQLException, InterruptedException {
+    public void createTable() throws SQLException {
         jdbcUserRepository.createTable();
     }
 
     /**
      * Метод удаляет таблицу users
      *
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public void dropTable() throws SQLException, InterruptedException {
+    public void dropTable() throws SQLException {
         jdbcUserRepository.dropTable();
     }
 
@@ -156,12 +149,11 @@ public class UserServiceImpl implements UserService {
      *
      * @param email электронная почта пользователя типа String
      * @return возвращает true или false в зависимости есть ли указанная электронная почта в таблице или нет.
-     * @throws InterruptedException возникает в случае ошибки получения подключения
      * @throws SQLException         возникает в случае ошибки запроса к базе данных
      *                              *
      */
     @Override
-    public boolean emailExist(String email) throws SQLException, InterruptedException {
+    public boolean emailExist(String email) throws SQLException {
         return jdbcUserRepository.emailExist(email);
     }
 }

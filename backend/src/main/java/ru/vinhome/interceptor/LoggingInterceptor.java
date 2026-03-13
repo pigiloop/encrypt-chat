@@ -30,3 +30,10 @@ public class LoggingInterceptor implements ContainerRequestFilter {
         logger.info("Вызван метод {}.{}() содержащий {}", target, methodName, body);
     }
 }
+
+
+/*
+не логировать чувствительные поля сейчас логов слишком много, полезные события теряются,
+плюс риски по безопасности особенно на фронте
+*/
+

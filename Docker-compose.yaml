@@ -13,6 +13,7 @@ networks:
 
 services:
   postgres_local:
+    profiles: [chat_local, chat_remote, chat_all]
     image: postgres:18.1-alpine3.22
     container_name: postgres_local
     environment:
@@ -29,6 +30,7 @@ services:
         target: /docker-entrypoint-initdb.d
 
   postgres_remote:
+    profiles: [chat_local, chat_remote, chat_all]
     image: postgres:18.1-alpine3.22
     container_name: postgres_remote
     environment:
@@ -46,6 +48,7 @@ services:
 
 
   backend-local:
+    profiles: [chat_local, chat_remote, chat_all]
     build:
       context: .
       dockerfile: backend\Dockerfile
@@ -71,6 +74,7 @@ services:
       start_interval: 5s
 
   backend-remote:
+    profiles: [chat_local, chat_remote, chat_all]
     build:
       context: .
       dockerfile: backend\Dockerfile
@@ -97,6 +101,7 @@ services:
 
 
   frontend-local:
+    profiles: [chat_local, chat_all]
     build:
       context: .
       dockerfile: frontend\Dockerfile
@@ -110,6 +115,7 @@ services:
       - net_frontend_local
 
   frontend-remote:
+    profiles: [chat_remote, chat_all]
     build:
       context: .
       dockerfile: frontend\Dockerfile

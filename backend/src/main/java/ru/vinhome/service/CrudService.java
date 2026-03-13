@@ -2,6 +2,7 @@ package ru.vinhome.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Интерфейс BaseRepository.
@@ -16,30 +17,27 @@ public interface CrudService<T, S, Q, I> {
      * Метод выводит все записи таблицы.
      * @return возвращает список объектов типа T
      * @exception SQLException выкидывает исключения в случае если база данных недоступна
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
      * *
      */
-    List<T> findAll() throws SQLException, InterruptedException;
+    List<T> findAll() throws SQLException;
 
     /**
      * Метод выводит запись таблицы по её уникальному идентификатору.
      * @param id идентификатор типа I
      * @return возвращает объект типа T
      * @exception SQLException выкидывает исключения в случае если база данных недоступна
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
      * *
      */
-    T findById(I id) throws SQLException, InterruptedException;
+    Optional<T> findById(I id) throws SQLException;
 
     /**
      * Метод сохраняет запись в таблице.
      * @param obj объект типа S
      * @return возвращает количество изменённых записей
      * @exception SQLException выкидывает исключения в случае если база данных недоступна
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
      **
      */
-    int save(S obj) throws SQLException, InterruptedException;
+    int save(S obj) throws SQLException;
 
     /**
      * Метод изменяет запись в таблице.
@@ -47,18 +45,16 @@ public interface CrudService<T, S, Q, I> {
      * @param obj объект типа T
      * @return возвращает количество изменённых записей
      * @exception SQLException выкидывает исключения в случае если база данных недоступна
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
      **
      */
-    int update(I id, Q obj) throws SQLException, InterruptedException;
+    int update(I id, Q obj) throws SQLException;
 
     /**
      * Метод удаляет запись из таблицы.
      * @param id идентификатор типа I
      * @return возвращает количество изменённых записей
      * @exception SQLException выкидывает исключения в случае если база данных недоступна
-     * @exception InterruptedException выкидывает исключение если все ресурсы заняты
      * *
      */
-    int delete(I id) throws SQLException, InterruptedException;
+    int delete(I id) throws SQLException;
 }
